@@ -21,8 +21,7 @@ export default function RegisterPage() {
         setMessage("Sedang memproses...");
 
         try {
-            // Menembak API Backend Spring Boot
-            const response = await fetch("http://localhost:8080/auth/register", {
+            const response = await fetch("http://52.4.194.198:8080/auth/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
