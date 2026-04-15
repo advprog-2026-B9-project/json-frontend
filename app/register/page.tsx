@@ -17,6 +17,7 @@ export default function RegisterCard() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
 
     const handleTogglePassword = () => setShowPassword(!showPassword);
     const handleToggleConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
@@ -41,8 +42,11 @@ export default function RegisterCard() {
             });
 
             if (response.ok) {
-                alert('Registration successful! Please login to continue.');
-                router.push('/login');
+                setToastMessage('Registrasi berhasil! Silakan login dengan akun baru Anda.');
+
+                setTimeout(() => {
+                    router.push('/login');
+                }, 1500);
             }
             else {
                 const errorText = await response.text();
@@ -62,10 +66,10 @@ export default function RegisterCard() {
         <div className={styles.pageContainer}>
             <div className={styles.card}>
                 <div className={styles.leftPanel}>
-                    <div className={`${styles.oval} ${styles.ovalLargeShadow}`}></div>
-                    <div className={`${styles.oval} ${styles.ovalLarge}`}></div>
-                    <div className={`${styles.oval} ${styles.ovalSmallTop}`}></div>
-                    <div className={`${styles.oval} ${styles.ovalSmallBottom}`}></div>
+                    <div className={`${styles.bgText} ${styles.letterJ}`}>J</div>
+                    <div className={`${styles.bgText} ${styles.letterS}`}>S</div>
+                    <div className={`${styles.bgText} ${styles.letterO}`}>O</div>
+                    <div className={`${styles.bgText} ${styles.letterN}`}>N</div>
                 </div>
 
                 <div className={styles.rightPanel}>
@@ -164,6 +168,16 @@ export default function RegisterCard() {
                     </form>
                 </div>
             </div>
+
+            {toastMessage && (
+                <div className={styles.toast}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: '8px'}}>
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    {toastMessage}
+                </div>
+            )}
         </div>
     );
 }
