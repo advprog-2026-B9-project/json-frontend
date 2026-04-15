@@ -102,6 +102,7 @@
   justify-content: space-between;
   gap: 28px;
   align-items: center;
+  animation: riseIn 500ms ease-out;
 }
 
 .walletMeta {
@@ -160,12 +161,35 @@
   color: #ffffff;
   background: linear-gradient(110deg, #802ef4, #8f42ff);
   box-shadow: 0 10px 22px rgba(107, 46, 244, 0.3);
+  transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
 .withdrawButton {
   border: 3px solid #9143ff;
   background: #ffffff;
   color: #8a3ef5;
+  transition: transform 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.topUpButton:hover,
+.topUpButton:focus-visible,
+.withdrawButton:hover,
+.withdrawButton:focus-visible {
+  transform: translateY(-2px);
+}
+
+.withdrawButton:hover,
+.withdrawButton:focus-visible {
+  border-color: #7a2df0;
+  color: #7a2df0;
+}
+
+.topUpButton:focus-visible,
+.withdrawButton:focus-visible,
+.seeAllButton:focus-visible,
+.searchInput:focus-visible {
+  outline: 2px solid #9250ff;
+  outline-offset: 2px;
 }
 
 .actionIcon {
@@ -218,10 +242,15 @@
   gap: 20px;
   align-items: center;
   padding: 28px 24px;
+  transition: background-color 140ms ease;
 }
 
 .transactionRow + .transactionRow {
   border-top: 1px solid #e9eaf0;
+}
+
+.transactionRow:hover {
+  background: #fafbff;
 }
 
 .iconCircle {
@@ -305,6 +334,18 @@
 .status_failed {
   background: #f8dcb1;
   color: #8a6200;
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 1100px) {
