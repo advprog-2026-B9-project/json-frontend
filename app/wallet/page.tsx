@@ -285,10 +285,11 @@ export default function WalletPage() {
                         <WalletIcon />
                         <span>Total Saldo Wallet</span>
                     </div>
-                    <h1 className={styles.walletAmount}>{formatRupiah(balance)}</h1>
+                    <h1 className={styles.walletAmount} aria-live="polite">{formatRupiah(balance)}</h1>
                     <span className={styles.verifiedBadge}>
                         {walletSummaryMock.status === "verified" ? "Verified Account" : "Unverified"}
                     </span>
+                    <p className={styles.mockHint}>Mock mode aktif, belum terhubung backend.</p>
                 </div>
 
                 <div className={styles.actionGroup}>
@@ -315,7 +316,7 @@ export default function WalletPage() {
                     </button>
                 </div>
 
-                <div className={styles.transactionCard}>
+                <div className={styles.transactionCard} aria-live="polite">
                     {filteredTransactions.length === 0 ? (
                         <div className={styles.emptyState}>Transaksi tidak ditemukan.</div>
                     ) : filteredTransactions.map((transaction) => {

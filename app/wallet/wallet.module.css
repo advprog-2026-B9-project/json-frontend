@@ -138,6 +138,12 @@
   font-weight: 600;
 }
 
+.mockHint {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: #8d91a0;
+}
+
 .actionGroup {
   display: flex;
   gap: 16px;
@@ -392,6 +398,10 @@
     font-size: 14px;
     padding: 6px 13px;
     margin-top: 14px;
+  }
+
+  .mockHint {
+    font-size: 12px;
   }
 
   .topUpButton,
