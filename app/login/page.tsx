@@ -12,6 +12,7 @@ export default function LoginCard() {
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
 
     const [showPassword, setShowPassword] = useState(false);
     const handleTogglePassword = () => setShowPassword(!showPassword);
@@ -41,10 +42,12 @@ export default function LoginCard() {
             if (response.ok) {
                 const userData = await response.json();
                 console.log('Login sukses!', userData);
-                alert(`Selamat datang, ${userData.fullName || userData.username}!`);
-                localStorage.setItem('user', JSON.stringify(userData));
 
-                router.push('/');
+                localStorage.setItem('user', JSON.stringify(userData));
+                setToastMessage(`Login berhasil! Selamat datang, ${userData.fullName || userData.username}.`);
+                setTimeout(() => {
+                    router.push('/');
+                }, 1500);
             }
             else {
                 const errorText = await response.text();
@@ -65,10 +68,10 @@ export default function LoginCard() {
             <div className={styles.card}>
 
                 <div className={styles.leftPanel}>
-                    <div className={`${styles.oval} ${styles.ovalLargeShadow}`}></div>
-                    <div className={`${styles.oval} ${styles.ovalLarge}`}></div>
-                    <div className={`${styles.oval} ${styles.ovalSmallTop}`}></div>
-                    <div className={`${styles.oval} ${styles.ovalSmallBottom}`}></div>
+                    <div className={`${styles.bgText} ${styles.letterJ}`}>J</div>
+                    <div className={`${styles.bgText} ${styles.letterS}`}>S</div>
+                    <div className={`${styles.bgText} ${styles.letterO}`}>O</div>
+                    <div className={`${styles.bgText} ${styles.letterN}`}>N</div>
                 </div>
 
                 <div className={styles.rightPanel}>
@@ -133,10 +136,18 @@ export default function LoginCard() {
                         <div className={styles.signUp}>
                             <Link href="/register">Sign Up</Link>
                         </div>
-
                     </form>
                 </div>
             </div>
+            {toastMessage && (
+                <div className={styles.toast}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: '8px'}}>
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    {toastMessage}
+                </div>
+            )}
         </div>
     );
 }
