@@ -1,0 +1,314 @@
+.page {
+  min-height: 100vh;
+  background: #f3f5fb;
+  color: #21232d;
+  padding-bottom: 48px;
+}
+
+.heroArea {
+  background: linear-gradient(115deg, #7a34f2 0%, #6b4ef7 45%, #4fa9f8 100%);
+  min-height: 290px;
+  padding: 34px 20px 110px;
+}
+
+.heroContent {
+  width: min(1040px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: auto minmax(260px, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+}
+
+.brand {
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  background: linear-gradient(90deg, #ad46ff 0%, #4cc6ff 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.searchWrapper {
+  height: 62px;
+  border-radius: 999px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  padding: 0 22px;
+  box-shadow: 0 8px 30px rgba(19, 18, 32, 0.16);
+  color: #b4b9c5;
+}
+
+.searchIcon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  border: 0;
+  width: 100%;
+  font-size: 31px;
+  color: #6e7380;
+  outline: none;
+  margin-left: 12px;
+  background: transparent;
+}
+
+.searchInput::placeholder {
+  color: #c0c5cf;
+}
+
+.profileArea {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #ffffff;
+}
+
+.profileLabel {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.profileName {
+  font-size: 20px;
+  opacity: 0.9;
+}
+
+.profileAvatar {
+  width: 62px;
+  height: 62px;
+  border-radius: 999px;
+  background-image: url("https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80");
+  background-position: center;
+  background-size: cover;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 8px 24px rgba(20, 25, 48, 0.35);
+}
+
+.walletCard {
+  width: min(1040px, calc(100% - 40px));
+  margin: -88px auto 0;
+  background: #ffffff;
+  border-radius: 28px;
+  box-shadow: 0 12px 30px rgba(26, 33, 72, 0.16);
+  padding: 42px;
+  display: flex;
+  justify-content: space-between;
+  gap: 28px;
+  align-items: center;
+}
+
+.walletMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 30px;
+  color: #777e91;
+  font-weight: 500;
+}
+
+.walletIcon {
+  width: 34px;
+  height: 34px;
+  color: #a7b8ff;
+}
+
+.walletAmount {
+  margin: 16px 0 0;
+  font-size: clamp(34px, 5.6vw, 78px);
+  line-height: 1;
+  color: #101214;
+}
+
+.verifiedBadge {
+  display: inline-flex;
+  margin-top: 22px;
+  background: #d9f3e0;
+  color: #2b9554;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 23px;
+  font-weight: 600;
+}
+
+.actionGroup {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.topUpButton,
+.withdrawButton {
+  border-radius: 18px;
+  height: 76px;
+  padding: 0 32px;
+  font-size: 33px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topUpButton {
+  border: 0;
+  color: #ffffff;
+  background: linear-gradient(110deg, #802ef4, #8f42ff);
+  box-shadow: 0 10px 22px rgba(107, 46, 244, 0.3);
+}
+
+.withdrawButton {
+  border: 3px solid #9143ff;
+  background: #ffffff;
+  color: #8a3ef5;
+}
+
+.actionIcon {
+  width: 30px;
+  height: 30px;
+}
+
+.transactionSection {
+  width: min(1040px, calc(100% - 40px));
+  margin: 66px auto 0;
+}
+
+.transactionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.transactionHeader h2 {
+  margin: 0;
+  font-size: clamp(36px, 4vw, 58px);
+}
+
+.seeAllButton {
+  border: 0;
+  background: transparent;
+  color: #9d57ff;
+  font-size: 32px;
+  font-weight: 600;
+}
+
+@media (max-width: 1100px) {
+  .brand {
+    font-size: 34px;
+  }
+
+  .searchWrapper {
+    height: 54px;
+  }
+
+  .searchInput {
+    font-size: 23px;
+  }
+
+  .profileLabel {
+    font-size: 18px;
+  }
+
+  .profileName {
+    font-size: 15px;
+  }
+
+  .profileAvatar {
+    width: 50px;
+    height: 50px;
+  }
+
+  .walletCard {
+    border-radius: 22px;
+    padding: 28px;
+  }
+
+  .walletMeta {
+    font-size: 20px;
+  }
+
+  .walletIcon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .verifiedBadge {
+    font-size: 14px;
+    padding: 6px 13px;
+    margin-top: 14px;
+  }
+
+  .topUpButton,
+  .withdrawButton {
+    height: 58px;
+    border-radius: 14px;
+    padding: 0 22px;
+    font-size: 22px;
+  }
+
+  .actionIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .transactionHeader h2 {
+    font-size: 40px;
+  }
+
+  .seeAllButton {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 820px) {
+  .heroArea {
+    padding-bottom: 120px;
+    min-height: 250px;
+  }
+
+  .heroContent {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .profileArea {
+    justify-self: end;
+  }
+
+  .walletCard {
+    margin-top: -84px;
+    flex-direction: column;
+    align-items: flex-start;
+    width: calc(100% - 28px);
+    padding: 24px;
+  }
+
+  .actionGroup {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .topUpButton,
+  .withdrawButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .transactionSection {
+    width: calc(100% - 28px);
+    margin-top: 40px;
+  }
+
+  .transactionHeader h2 {
+    font-size: 32px;
+  }
+
+  .seeAllButton {
+    font-size: 18px;
+  }
+}
