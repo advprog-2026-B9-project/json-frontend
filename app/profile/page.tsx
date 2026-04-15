@@ -57,8 +57,8 @@ export default function ProfilePage() {
         }
         else {
             setIsAuthenticated(true);
-            setFullName('Rafasya Muhammad Subhan');
-            setUsername('rafasya');
+            setFullName('John Doe');
+            setUsername('John');
             setEmail('example@gmail.com');
             setRole('TITIPERS');
             setPhoneNumber('+62 123456789');
@@ -77,6 +77,10 @@ export default function ProfilePage() {
     }, []);
 
     const renderBadge = () => {
+        if (role === 'ADMIN') {
+            return null;
+        }
+
         switch (verificationStatus) {
             case 'VERIFIED':
                 return <span className={`${styles.badge} ${styles.badgeVerified}`}>Verified Jastiper</span>;
@@ -88,7 +92,6 @@ export default function ProfilePage() {
         }
     };
 
-    // == Profile Editing ==
     const handleEditClick = () => {
         setIsEditing(true);
     };
@@ -104,7 +107,8 @@ export default function ProfilePage() {
         setToast({ message: '', isError: false });
 
         try {
-            const response = await fetch(`http://localhost:8080/auth/profile?email=${encodeURIComponent(email)}`, {
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+            const response = await fetch(`${API_URL}/auth/profile?email=${encodeURIComponent(email)}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ fullName, username, phoneNumber, address }),
@@ -130,7 +134,6 @@ export default function ProfilePage() {
         }
     };
 
-    // == Handle Modal ==
     const handleNikChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         if (/^\d{0,16}$/.test(value)) {
@@ -149,7 +152,7 @@ export default function ProfilePage() {
         setKtpNIK('');
     };
 
-    const handleKycSubmit = () => {
+    const handleKycSubmit = async () => {
         if (!ktpFullName.trim()) {
             showNotification('Nama lengkap sesuai KTP wajib diisi!', true);
             return;
@@ -160,15 +163,41 @@ export default function ProfilePage() {
             return;
         }
 
-        alert(`Pengajuan Jastiper dikirim untuk:\nNama Lengkap: ${ktpFullName}\nNIK: ${ktpNIK}`);
-        handleCloseKycModal();
+        try {
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+            const response = await fetch(`${API_URL}/auth/kyc/submit`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: email,
+                    fullName: ktpFullName,
+                    nikKtp: ktpNIK,
+                    ktpImageUrl: 'https://dummyimage.com/ktp-placeholder.jpg'
+                }),
+            });
+
+            if (response.ok) {
+                const updatedUser = await response.json();
+
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+
+                setVerificationStatus(updatedUser.kycStatus);
+                showNotification('Pengajuan Jastiper berhasil dikirim!', false);
+                handleCloseKycModal();
+            } else {
+                const errorText = await response.text();
+                showNotification(errorText || 'Gagal mengirim pengajuan.', true);
+            }
+        } catch (error) {
+            console.error(error);
+            showNotification('Gagal terhubung ke server.', true);
+        }
     };
 
     if (!isAuthenticated && !toast.message) return null;
     return (
         <div className={styles.pageContainer}>
 
-            {/*== Toast Notification ==*/}
             {toast.message && (
                 <div className={`${styles.toast} ${toast.isError ? styles.toastError : styles.toastSuccess}`}>
                     {toast.isError ? (
@@ -180,10 +209,8 @@ export default function ProfilePage() {
                 </div>
             )}
 
-            {/* == Banner == */}
             <div className={styles.banner}></div>
 
-            {/* == Main Card == */}
             <div className={styles.card}>
                 <div className={styles.avatarAbsoluteWrapper}>
                     <div className={styles.avatarContainer}>
@@ -229,7 +256,6 @@ export default function ProfilePage() {
                 </div>
 
                 <div className={styles.gridContainer}>
-                    {/* == Left Section == */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         <div className={styles.inputGroup}>
                             <label className={styles.label}>Full Name</label>
@@ -247,7 +273,6 @@ export default function ProfilePage() {
                         </div>
                     </div>
 
-                    {/*== Right Section ==*/}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         <div className={styles.inputGroup}>
                             <label className={styles.label}>Email Address</label>
@@ -261,7 +286,6 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                {/*== Address ==*/}
                 <div style={{ marginTop: '20px', width: '100%' }}>
                     <div className={styles.inputGroup}>
                         <label className={styles.label}>Address</label>
@@ -269,7 +293,6 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                {/*== Upgrade ==*/}
                 {role === 'TITIPERS' && verificationStatus === 'UNVERIFIED' && !isEditing && (
                     <div className={styles.upgradeContainer}>
                         <p className={styles.upgradeText}>
@@ -281,7 +304,6 @@ export default function ProfilePage() {
                     </div>
                 )}
 
-                {/*== Logout ==*/}
                 <div style={{ marginTop: '50px', textAlign: 'center' }}>
                     <Link href="/login" onClick={() => localStorage.removeItem('user')} className={styles.logoutLink}>
                         Log Out
@@ -289,7 +311,6 @@ export default function ProfilePage() {
                 </div>
             </div>
 
-            {/*== Modal ==*/}
             {isKycModalOpen && (
                 <div className={styles.backdrop} onClick={handleCloseKycModal}>
                     <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
