@@ -100,6 +100,18 @@ const transactionHistoryMock: TransactionItem[] = [
     },
 ];
 
+const formatTimeNow = (): string => {
+    const now = new Date();
+    return new Intl.DateTimeFormat("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+    }).format(now).replace(".", ":");
+};
+
 const formatRupiah = (value: number): string => {
     return `Rp ${new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(value)}`;
 };
@@ -174,6 +186,8 @@ export default function WalletPage() {
     const [session, setSession] = useState<AuthSession | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [showAllTransactions, setShowAllTransactions] = useState(false);
+    const [balance, setBalance] = useState(walletSummaryMock.balance);
+    const [transactions, setTransactions] = useState(transactionHistoryMock);
 
     useEffect(() => {
         const currentSession = getAuthSession();
@@ -189,8 +203,8 @@ export default function WalletPage() {
     const filteredTransactions = useMemo(() => {
         const normalizedQuery = searchQuery.trim().toLowerCase();
         const baseData = normalizedQuery.length === 0
-            ? transactionHistoryMock
-            : transactionHistoryMock.filter((item) => {
+            ? transactions
+            : transactions.filter((item) => {
                 return (
                     item.title.toLowerCase().includes(normalizedQuery) ||
                     item.dateLabel.toLowerCase().includes(normalizedQuery)
@@ -202,7 +216,41 @@ export default function WalletPage() {
         }
 
         return baseData.slice(0, 5);
-    }, [searchQuery, showAllTransactions]);
+    }, [searchQuery, showAllTransactions, transactions]);
+
+    const prependTransaction = (entry: Omit<TransactionItem, "id">) => {
+        setTransactions((previous) => [
+            {
+                id: `tx-${previous.length + 1}-${Date.now()}`,
+                ...entry,
+            },
+            ...previous,
+        ]);
+    };
+
+    const handleTopUp = () => {
+        const amount = 100_000;
+        setBalance((previous) => previous + amount);
+        prependTransaction({
+            title: "Top Up Wallet via Mock Gateway",
+            dateLabel: formatTimeNow(),
+            amount,
+            type: "topup",
+            status: "success",
+        });
+    };
+
+    const handleWithdraw = () => {
+        const amount = 75_000;
+        setBalance((previous) => previous - amount);
+        prependTransaction({
+            title: "Tarik Dana Mock ke Bank",
+            dateLabel: formatTimeNow(),
+            amount: -amount,
+            type: "withdraw",
+            status: "pending",
+        });
+    };
 
     return (
         <main className={`${styles.page} ${poppins.className}`}>
@@ -237,18 +285,18 @@ export default function WalletPage() {
                         <WalletIcon />
                         <span>Total Saldo Wallet</span>
                     </div>
-                    <h1 className={styles.walletAmount}>{formatRupiah(walletSummaryMock.balance)}</h1>
+                    <h1 className={styles.walletAmount}>{formatRupiah(balance)}</h1>
                     <span className={styles.verifiedBadge}>
                         {walletSummaryMock.status === "verified" ? "Verified Account" : "Unverified"}
                     </span>
                 </div>
 
                 <div className={styles.actionGroup}>
-                    <button type="button" className={styles.topUpButton}>
+                    <button type="button" className={styles.topUpButton} onClick={handleTopUp}>
                         <TopUpIcon />
                         Top Up
                     </button>
-                    <button type="button" className={styles.withdrawButton}>
+                    <button type="button" className={styles.withdrawButton} onClick={handleWithdraw}>
                         <WithdrawIcon />
                         Withdraw
                     </button>
