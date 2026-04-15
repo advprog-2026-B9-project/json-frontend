@@ -1,10 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './login.module.css';
 
 export default function LoginCard() {
+    const router = useRouter();
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
@@ -13,13 +16,21 @@ export default function LoginCard() {
     const [showPassword, setShowPassword] = useState(false);
     const handleTogglePassword = () => setShowPassword(!showPassword);
 
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            router.push('/');
+        }
+    }, [router]);
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setErrorMessage('');
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://localhost:8080/auth/login', {
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+            const response = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -31,9 +42,9 @@ export default function LoginCard() {
                 const userData = await response.json();
                 console.log('Login sukses!', userData);
                 alert(`Selamat datang, ${userData.fullName || userData.username}!`);
+                localStorage.setItem('user', JSON.stringify(userData));
 
-                // TODO: Redirect ke homepage atau simpan token ke localStorage/Context
-                // contoh: window.location.href = '/homepage';
+                router.push('/');
             }
             else {
                 const errorText = await response.text();
@@ -51,10 +62,8 @@ export default function LoginCard() {
 
     return (
         <div className={styles.pageContainer}>
-            {/*== Main Card ==*/}
             <div className={styles.card}>
 
-                {/*== Left Panel ==*/}
                 <div className={styles.leftPanel}>
                     <div className={`${styles.oval} ${styles.ovalLargeShadow}`}></div>
                     <div className={`${styles.oval} ${styles.ovalLarge}`}></div>
@@ -62,21 +71,16 @@ export default function LoginCard() {
                     <div className={`${styles.oval} ${styles.ovalSmallBottom}`}></div>
                 </div>
 
-                {/*== Right Panel ==*/}
                 <div className={styles.rightPanel}>
                     <form className={styles.formContainer} onSubmit={handleLogin}>
-
-                        {/*== Title ==*/}
                         <h1 className={styles.title}>JSON</h1>
 
-                        {/*== Error Message ==*/}
                         {errorMessage && (
                             <p style={{ color: '#ffb3b3', fontSize: '12px', textAlign: 'center', marginBottom: '10px' }}>
                                 {errorMessage}
                             </p>
                         )}
 
-                        {/*== Email ==*/}
                         <div className={styles.inputGroup}>
                             <svg className={styles.inputIcon} viewBox="0 0 24 24">
                                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
@@ -91,7 +95,6 @@ export default function LoginCard() {
                             />
                         </div>
 
-                        {/*== Password ==*/}
                         <div className={styles.inputGroup}>
                             <svg className={styles.inputIcon} viewBox="0 0 24 24">
                                 <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
@@ -106,7 +109,6 @@ export default function LoginCard() {
                                 required
                             />
 
-                            {/*== Show/Hide Password ==*/}
                             {showPassword ? (
                                 <svg className={styles.eyeIcon} viewBox="0 0 24 24" onClick={handleTogglePassword}>
                                     <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
@@ -124,12 +126,10 @@ export default function LoginCard() {
                             <a href="#">Forgot Password</a>
                         </div>
 
-                        {/*== Submit Button ==*/}
                         <button type="submit" className={styles.loginButton} disabled={isLoading}>
                             {isLoading ? 'Logging In...' : 'Login'}
                         </button>
 
-                        {/*== Sign Up ==*/}
                         <div className={styles.signUp}>
                             <Link href="/register">Sign Up</Link>
                         </div>
