@@ -206,6 +206,12 @@
   box-shadow: 0 8px 24px rgba(24, 33, 76, 0.08);
 }
 
+.emptyState {
+  padding: 30px 22px;
+  font-size: 15px;
+  color: #7d8291;
+}
+
 .transactionRow {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;

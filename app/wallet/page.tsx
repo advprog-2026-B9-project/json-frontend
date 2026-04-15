@@ -172,6 +172,8 @@ const WithdrawIcon = () => (
 export default function WalletPage() {
     const router = useRouter();
     const [session, setSession] = useState<AuthSession | null>(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [showAllTransactions, setShowAllTransactions] = useState(false);
 
     useEffect(() => {
         const currentSession = getAuthSession();
@@ -184,6 +186,23 @@ export default function WalletPage() {
     }, [router]);
 
     const profileName = useMemo(() => session?.fullName || "Titipers", [session?.fullName]);
+    const filteredTransactions = useMemo(() => {
+        const normalizedQuery = searchQuery.trim().toLowerCase();
+        const baseData = normalizedQuery.length === 0
+            ? transactionHistoryMock
+            : transactionHistoryMock.filter((item) => {
+                return (
+                    item.title.toLowerCase().includes(normalizedQuery) ||
+                    item.dateLabel.toLowerCase().includes(normalizedQuery)
+                );
+            });
+
+        if (showAllTransactions) {
+            return baseData;
+        }
+
+        return baseData.slice(0, 5);
+    }, [searchQuery, showAllTransactions]);
 
     return (
         <main className={`${styles.page} ${poppins.className}`}>
@@ -193,7 +212,13 @@ export default function WalletPage() {
 
                     <div className={styles.searchWrapper}>
                         <SearchIcon />
-                        <input className={styles.searchInput} placeholder="Search" aria-label="Cari transaksi" />
+                        <input
+                            className={styles.searchInput}
+                            placeholder="Search"
+                            aria-label="Cari transaksi"
+                            value={searchQuery}
+                            onChange={(event) => setSearchQuery(event.target.value)}
+                        />
                     </div>
 
                     <div className={styles.profileArea}>
@@ -233,13 +258,19 @@ export default function WalletPage() {
             <section className={styles.transactionSection}>
                 <div className={styles.transactionHeader}>
                     <h2>Riwayat Transaksi</h2>
-                    <button type="button" className={styles.seeAllButton}>
-                        Lihat Semua
+                    <button
+                        type="button"
+                        className={styles.seeAllButton}
+                        onClick={() => setShowAllTransactions((value) => !value)}
+                    >
+                        {showAllTransactions ? "Ringkas" : "Lihat Semua"}
                     </button>
                 </div>
 
                 <div className={styles.transactionCard}>
-                    {transactionHistoryMock.map((transaction) => {
+                    {filteredTransactions.length === 0 ? (
+                        <div className={styles.emptyState}>Transaksi tidak ditemukan.</div>
+                    ) : filteredTransactions.map((transaction) => {
                         const amountClass = transaction.amount >= 0 ? styles.amountPlus : styles.amountMinus;
                         return (
                             <article key={transaction.id} className={styles.transactionRow}>
