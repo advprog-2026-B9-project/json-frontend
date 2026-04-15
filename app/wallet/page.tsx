@@ -16,13 +16,127 @@ type WalletSummary = {
     status: "verified";
 };
 
+type TransactionStatus = "success" | "pending" | "failed";
+type TransactionType = "topup" | "payment" | "withdraw";
+
+type TransactionItem = {
+    id: string;
+    title: string;
+    dateLabel: string;
+    amount: number;
+    type: TransactionType;
+    status: TransactionStatus;
+};
+
 const walletSummaryMock: WalletSummary = {
     balance: 4_500_000,
     status: "verified",
 };
 
+const transactionHistoryMock: TransactionItem[] = [
+    {
+        id: "tx-001",
+        title: "Top Up Wallet via BCA",
+        dateLabel: "15 April 2026, 14:30",
+        amount: 5_000_000,
+        type: "topup",
+        status: "success",
+    },
+    {
+        id: "tx-002",
+        title: "Pembayaran Jastip - Sepatu Nike",
+        dateLabel: "14 April 2026, 10:15",
+        amount: -1_250_000,
+        type: "payment",
+        status: "success",
+    },
+    {
+        id: "tx-003",
+        title: "Tarik Dana ke Bank Mandiri",
+        dateLabel: "10 April 2026, 09:00",
+        amount: -500_000,
+        type: "withdraw",
+        status: "pending",
+    },
+    {
+        id: "tx-004",
+        title: "Top Up Wallet via GoPay",
+        dateLabel: "08 April 2026, 16:45",
+        amount: 250_000,
+        type: "topup",
+        status: "success",
+    },
+    {
+        id: "tx-005",
+        title: "Pembayaran Tagihan Listrik",
+        dateLabel: "05 April 2026, 13:20",
+        amount: -350_000,
+        type: "payment",
+        status: "success",
+    },
+    {
+        id: "tx-006",
+        title: "Top Up Wallet via OVO",
+        dateLabel: "02 April 2026, 08:30",
+        amount: 1_000_000,
+        type: "topup",
+        status: "success",
+    },
+    {
+        id: "tx-007",
+        title: "Pembayaran Jastip - Tas Coach",
+        dateLabel: "28 Maret 2026, 19:45",
+        amount: -2_100_000,
+        type: "payment",
+        status: "success",
+    },
+    {
+        id: "tx-008",
+        title: "Tarik Dana ke BNI",
+        dateLabel: "25 Maret 2026, 11:15",
+        amount: -1_000_000,
+        type: "withdraw",
+        status: "failed",
+    },
+];
+
 const formatRupiah = (value: number): string => {
     return `Rp ${new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(value)}`;
+};
+
+const formatDeltaAmount = (value: number): string => {
+    const sign = value >= 0 ? "+" : "-";
+    return `${sign} ${formatRupiah(Math.abs(value))}`;
+};
+
+const statusLabel: Record<TransactionStatus, string> = {
+    success: "Success",
+    pending: "Pending",
+    failed: "Failed",
+};
+
+const HistoryIcon = ({ type }: { type: TransactionType }) => {
+    if (type === "topup") {
+        return (
+            <svg viewBox="0 0 24 24" className={styles.historyIcon} aria-hidden="true">
+                <path d="M6.5 7.5a1 1 0 0 1 1 1v4.1l9.8-9.8a1 1 0 1 1 1.4 1.4l-9.8 9.8H13a1 1 0 1 1 0 2H5.5a1 1 0 0 1-1-1V8.5a1 1 0 0 1 1-1Z" fill="currentColor" />
+            </svg>
+        );
+    }
+
+    if (type === "withdraw") {
+        return (
+            <svg viewBox="0 0 24 24" className={styles.historyIcon} aria-hidden="true">
+                <path d="M4 8.5h16v1.5H4V8.5Zm2 3h12v7H6v-7Zm3 2v3h1.5v-3H9Zm4.5 0v3H15v-3h-1.5ZM7 7l5-3 5 3H7Z" fill="currentColor" />
+            </svg>
+        );
+    }
+
+    return (
+        <svg viewBox="0 0 24 24" className={styles.historyIcon} aria-hidden="true">
+            <path d="M7 3h8l4 4v14H5V3h2Zm1.5 4.5h7v-1.5h-7v1.5Zm0 4h7V10h-7v1.5Zm0 4h5V14h-5v1.5Z" fill="currentColor" />
+        </svg>
+    );
 };
 
 const SearchIcon = () => (
@@ -122,6 +236,33 @@ export default function WalletPage() {
                     <button type="button" className={styles.seeAllButton}>
                         Lihat Semua
                     </button>
+                </div>
+
+                <div className={styles.transactionCard}>
+                    {transactionHistoryMock.map((transaction) => {
+                        const amountClass = transaction.amount >= 0 ? styles.amountPlus : styles.amountMinus;
+                        return (
+                            <article key={transaction.id} className={styles.transactionRow}>
+                                <div className={`${styles.iconCircle} ${styles[`icon_${transaction.type}`]}`}>
+                                    <HistoryIcon type={transaction.type} />
+                                </div>
+
+                                <div className={styles.transactionInfo}>
+                                    <h3>{transaction.title}</h3>
+                                    <p>{transaction.dateLabel}</p>
+                                </div>
+
+                                <div className={styles.transactionMeta}>
+                                    <div className={`${styles.transactionAmount} ${amountClass}`}>
+                                        {formatDeltaAmount(transaction.amount)}
+                                    </div>
+                                    <span className={`${styles.statusBadge} ${styles[`status_${transaction.status}`]}`}>
+                                        {statusLabel[transaction.status]}
+                                    </span>
+                                </div>
+                            </article>
+                        );
+                    })}
                 </div>
             </section>
         </main>

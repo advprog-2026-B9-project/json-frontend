@@ -197,6 +197,110 @@
   font-weight: 600;
 }
 
+.transactionCard {
+  margin-top: 26px;
+  background: #ffffff;
+  border: 1px solid #e3e5ec;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(24, 33, 76, 0.08);
+}
+
+.transactionRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+  padding: 28px 24px;
+}
+
+.transactionRow + .transactionRow {
+  border-top: 1px solid #e9eaf0;
+}
+
+.iconCircle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon_topup {
+  background: #d8efe0;
+  color: #22a055;
+}
+
+.icon_payment {
+  background: #f9e2e7;
+  color: #f85d69;
+}
+
+.icon_withdraw {
+  background: #fdebcf;
+  color: #e39b1f;
+}
+
+.historyIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.transactionInfo h3 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.25;
+  color: #232631;
+}
+
+.transactionInfo p {
+  margin: 5px 0 0;
+  font-size: 14px;
+  color: #878c99;
+}
+
+.transactionMeta {
+  text-align: right;
+}
+
+.transactionAmount {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.amountPlus {
+  color: #1d9a4f;
+}
+
+.amountMinus {
+  color: #2d2f39;
+}
+
+.statusBadge {
+  display: inline-flex;
+  margin-top: 10px;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status_success {
+  background: #d8efe0;
+  color: #2a9f56;
+}
+
+.status_pending {
+  background: #f8e4ae;
+  color: #8f6a00;
+}
+
+.status_failed {
+  background: #f8dcb1;
+  color: #8a6200;
+}
+
 @media (max-width: 1100px) {
   .brand {
     font-size: 34px;
@@ -263,6 +367,19 @@
   .seeAllButton {
     font-size: 22px;
   }
+
+  .transactionRow {
+    padding: 22px 20px;
+    gap: 14px;
+  }
+
+  .transactionInfo h3 {
+    font-size: 18px;
+  }
+
+  .transactionAmount {
+    font-size: 19px;
+  }
 }
 
 @media (max-width: 820px) {
@@ -310,5 +427,53 @@
 
   .seeAllButton {
     font-size: 18px;
+  }
+
+  .transactionCard {
+    margin-top: 18px;
+    border-radius: 18px;
+  }
+
+  .transactionRow {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "icon info"
+      "icon meta";
+    align-items: start;
+    row-gap: 8px;
+    padding: 18px 14px;
+  }
+
+  .iconCircle {
+    grid-area: icon;
+    width: 42px;
+    height: 42px;
+  }
+
+  .historyIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .transactionInfo {
+    grid-area: info;
+  }
+
+  .transactionInfo h3 {
+    font-size: 16px;
+  }
+
+  .transactionMeta {
+    grid-area: meta;
+    text-align: left;
+  }
+
+  .transactionAmount {
+    font-size: 17px;
+  }
+
+  .statusBadge {
+    margin-top: 6px;
+    font-size: 11px;
   }
 }
