@@ -33,7 +33,8 @@ export default function RegisterCard() {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://localhost:8080/auth/register', {
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+            const response = await fetch(`${API_URL}/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ fullName, email, password }),
@@ -41,7 +42,7 @@ export default function RegisterCard() {
 
             if (response.ok) {
                 alert('Registration successful! Please login to continue.');
-                router.push('/login'); // Lempar user ke halaman login setelah sukses
+                router.push('/login');
             }
             else {
                 const errorText = await response.text();
@@ -59,10 +60,7 @@ export default function RegisterCard() {
 
     return (
         <div className={styles.pageContainer}>
-            {/*== Main Card ==*/}
             <div className={styles.card}>
-
-                {/*== Left Panel ==*/}
                 <div className={styles.leftPanel}>
                     <div className={`${styles.oval} ${styles.ovalLargeShadow}`}></div>
                     <div className={`${styles.oval} ${styles.ovalLarge}`}></div>
@@ -70,19 +68,16 @@ export default function RegisterCard() {
                     <div className={`${styles.oval} ${styles.ovalSmallBottom}`}></div>
                 </div>
 
-                {/*== Right Panel ==*/}
                 <div className={styles.rightPanel}>
                     <form className={styles.formContainer} onSubmit={handleRegister}>
                         <h1 className={styles.title}>Register</h1>
 
-                        {/*== Error Message ==*/}
                         {errorMessage && (
                             <p style={{ color: '#ffb3b3', fontSize: '12px', textAlign: 'center', marginBottom: '10px' }}>
                                 {errorMessage}
                             </p>
                         )}
 
-                        {/*== Full Name ==*/}
                         <div className={styles.inputGroup}>
                             <svg className={styles.inputIcon} viewBox="0 0 24 24">
                                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
@@ -97,7 +92,6 @@ export default function RegisterCard() {
                             />
                         </div>
 
-                        {/*== Email ==*/}
                         <div className={styles.inputGroup}>
                             <svg className={styles.inputIcon} viewBox="0 0 24 24">
                                 <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
@@ -112,7 +106,6 @@ export default function RegisterCard() {
                             />
                         </div>
 
-                        {/*== Password ==*/}
                         <div className={styles.inputGroup}>
                             <svg className={styles.inputIcon} viewBox="0 0 24 24">
                                 <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
@@ -137,7 +130,6 @@ export default function RegisterCard() {
                             )}
                         </div>
 
-                        {/*== Confirm Password ==*/}
                         <div className={styles.inputGroup}>
                             <svg className={styles.inputIcon} viewBox="0 0 24 24">
                                 <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
@@ -161,12 +153,10 @@ export default function RegisterCard() {
                             )}
                         </div>
 
-                        {/*== Submit Button ==*/}
                         <button type="submit" className={styles.registerButton} disabled={isLoading}>
                             {isLoading ? 'Processing...' : 'Register'}
                         </button>
 
-                        {/*== Sign In ==*/}
                         <div className={styles.signIn}>
                             <span>Already have an account? </span>
                             <Link href="/login">Login here</Link>
