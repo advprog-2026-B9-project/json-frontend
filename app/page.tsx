@@ -1,99 +1,107 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import styles from "./home.module.css";
 
-export default function LoginPage() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-  const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+interface UserData {
+    email?: string;
+    role?: string;
+    fullName?: string;
+    username?: string;
+}
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+export default function HomePage() {
+    const router = useRouter();
+    const [isLoading, setIsLoading] = useState(true);
+    const [user, setUser] = useState<UserData | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setMessage("Sedang memeriksa data...");
+    useEffect(() => {
+        const storedUser = localStorage.getItem("user");
+        if (!storedUser) {
+            router.push("/login");
+        }
+        else {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setUser(JSON.parse(storedUser) as UserData);
+            setIsLoading(false);
+        }
+    }, [router]);
 
-    try {
-      const response = await fetch("http://52.4.194.198:8080/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setMessage(`Login Sukses! Selamat datang kembali, ${data.fullName}.`);
-
-        // TODO: tambahkan logika untuk pindah ke halaman Dashboard/Profile
-
-      } else {
-        setMessage("Login Gagal! Email atau password salah.");
-      }
-    } catch (error) {
-      setMessage("Gagal terhubung ke server. Pastikan Backend Spring Boot menyala!");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-      <div style={{ maxWidth: "400px", margin: "50px auto", fontFamily: "sans-serif" }}>
-        <div style={{ textAlign: "center", marginBottom: "20px" }}>
-          <h2>Login ke JSON Platform</h2>
-        </div>
-
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-          <div>
-            <label>Email:</label><br />
-            <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                style={{ width: "100%", padding: "8px", border: "1px solid #ccc", borderRadius: "4px" }}
-            />
-          </div>
-
-          <div>
-            <label>Password:</label><br />
-            <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                style={{ width: "100%", padding: "8px", border: "1px solid #ccc", borderRadius: "4px" }}
-            />
-          </div>
-
-          <button
-              type="submit"
-              disabled={isLoading}
-              style={{ padding: "10px", backgroundColor: "#0070f3", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}
-          >
-            {isLoading ? "Loading..." : "Login"}
-          </button>
-        </form>
-
-        {message && (
-            <div style={{ marginTop: "20px", padding: "10px", border: "1px solid #ccc", borderRadius: "5px", backgroundColor: "#f9f9f9", textAlign: "center" }}>
-              {message}
+    if (isLoading) {
+        return (
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+                <p>Memuat halaman...</p>
             </div>
-        )}
+        );
+    }
 
-        <div style={{ marginTop: "20px", textAlign: "center", fontSize: "14px" }}>
-          Belum punya akun? <Link href="/register" style={{ color: "#0070f3", textDecoration: "none" }}>Daftar di sini</Link>
+    const isAdmin = user?.role === 'ADMIN';
+
+    return (
+        <div className={styles.pageContainer}>
+            <nav className={styles.navbar}>
+                <div className={styles.logo}>JSON</div>
+
+                <div className={styles.searchWrapper}>
+                    <div className={styles.searchBar}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input
+                            type="text"
+                            placeholder="Search"
+                            className={styles.searchInput}
+                        />
+                    </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {isAdmin && (
+                        <Link href="/admin/dashboard" className={styles.adminButton}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: '8px'}}>
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            </svg>
+                            Admin Panel
+                        </Link>
+                    )}
+
+                    <Link href="/profile" className={styles.userLink}>
+                        <div className={styles.userInfo}>
+                            <div className={styles.userName}>{user?.fullName || user?.username}</div>
+
+                            <div className={styles.userRole}>
+                                {isAdmin ? 'Administrator' : (user?.role || 'Titipers')}
+                            </div>
+                        </div>
+
+                        <div className={styles.avatarCircle}>
+                            <img
+                                src={`https://api.dicebear.com/7.x/initials/svg?seed=${user?.fullName || 'User'}&backgroundColor=000000`}
+                                alt="Avatar"
+                                className={styles.avatarImg}
+                            />
+                        </div>
+                    </Link>
+                </div>
+            </nav>
+
+            <main className={styles.main}>
+                <div className={styles.banner}>
+                    <h1 className={styles.bannerTitle}>
+                        Siap-siap War Tiket & Barang<br />Limited!
+                    </h1>
+                    <p className={styles.bannerText}>
+                        Gunakan voucher <strong>JSONWAR50</strong> untuk diskon ongkos<br />
+                        jastip 50%. Kuota terbatas untuk 100 orang pertama!
+                    </p>
+                    <button type="button" className={styles.klaimButton}>
+                        Klaim Voucher
+                    </button>
+                </div>
+            </main>
         </div>
-      </div>
-  );
+    );
 }
