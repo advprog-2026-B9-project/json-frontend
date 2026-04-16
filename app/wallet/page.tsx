@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Poppins } from "next/font/google";
 import { useRouter } from "next/navigation";
-import { getAuthSession, type AuthSession } from "@/lib/auth-session";
 import styles from "./wallet.module.css";
 
 const poppins = Poppins({
@@ -28,8 +27,13 @@ type TransactionItem = {
     status: TransactionStatus;
 };
 
+type UserSession = {
+    fullName?: string;
+    username?: string;
+};
+
 const walletSummaryMock: WalletSummary = {
-    balance: 4_500_000,
+    balance: 0,
     status: "verified",
 };
 
@@ -183,23 +187,30 @@ const WithdrawIcon = () => (
 
 export default function WalletPage() {
     const router = useRouter();
-    const [session, setSession] = useState<AuthSession | null>(null);
+    const [session, setSession] = useState<UserSession | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [showAllTransactions, setShowAllTransactions] = useState(false);
     const [balance, setBalance] = useState(walletSummaryMock.balance);
     const [transactions, setTransactions] = useState(transactionHistoryMock);
 
     useEffect(() => {
-        const currentSession = getAuthSession();
-        if (!currentSession) {
+        const storedUser = localStorage.getItem("user");
+        if (!storedUser) {
             router.replace("/");
             return;
         }
 
-        setSession(currentSession);
+        try {
+            const parsedUser = JSON.parse(storedUser) as UserSession;
+            setSession(parsedUser);
+        }
+        catch {
+            localStorage.removeItem("user");
+            router.replace("/");
+        }
     }, [router]);
 
-    const profileName = useMemo(() => session?.fullName || "Titipers", [session?.fullName]);
+    const profileName = useMemo(() => session?.fullName || session?.username || "Titipers", [session?.fullName, session?.username]);
     const filteredTransactions = useMemo(() => {
         const normalizedQuery = searchQuery.trim().toLowerCase();
         const baseData = normalizedQuery.length === 0
