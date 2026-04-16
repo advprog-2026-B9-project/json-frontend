@@ -42,7 +42,14 @@ export default function HomePage() {
     return (
         <div className={styles.pageContainer}>
             <nav className={styles.navbar}>
-                <div className={styles.logo}>JSON</div>
+                <div className={styles.logoWrapper}>
+                    <div className={styles.logoScaled}>
+                        <div className={`${styles.bgText} ${styles.letterJ}`}>J</div>
+                        <div className={`${styles.bgText} ${styles.letterS}`}>S</div>
+                        <div className={`${styles.bgText} ${styles.letterO}`}>O</div>
+                        <div className={`${styles.bgText} ${styles.letterN}`}>N</div>
+                    </div>
+                </div>
 
                 <div className={styles.searchWrapper}>
                     <div className={styles.searchBar}>
