@@ -1,0 +1,93 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  font-family: 'Inter', sans-serif;
+}
+
+.orderBox {
+  background-color: #ffffff;
+  padding: 3rem 2.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.logoText {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -2px;
+}
+
+.titleText {
+  color: #6b7280;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+.detailsContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #f9fafb;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  color: #4b5563;
+}
+
+.totalPrice {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+  font-weight: 700;
+  color: #111827;
+  font-size: 1.2rem;
+}
+
+.paymentButton {
+  width: 100%;
+  padding: 0.875rem;
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.paymentButton:hover {
+  background-color: #4f46e5;
+}
+
+.statusMsg {
+  margin-top: 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #059669;
+}
