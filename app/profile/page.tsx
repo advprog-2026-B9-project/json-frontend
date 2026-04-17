@@ -163,13 +163,22 @@ export default function ProfilePage() {
             return;
         }
 
+        const savedUserString = localStorage.getItem('user');
+        if (!savedUserString) {
+            showNotification('Sesi tidak ditemukan. Silakan login ulang.', true);
+            return;
+        }
+
+        const loggedInUser = JSON.parse(savedUserString);
+        const userEmail = loggedInUser.email;
+
         try {
             const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
             const response = await fetch(`${API_URL}/auth/kyc/submit`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    email: email,
+                    email: userEmail,
                     fullName: ktpFullName,
                     nikKtp: ktpNIK,
                     ktpImageUrl: 'https://dummyimage.com/ktp-placeholder.jpg'
@@ -178,7 +187,6 @@ export default function ProfilePage() {
 
             if (response.ok) {
                 const updatedUser = await response.json();
-
                 localStorage.setItem('user', JSON.stringify(updatedUser));
 
                 setVerificationStatus(updatedUser.kycStatus);
@@ -189,7 +197,7 @@ export default function ProfilePage() {
                 showNotification(errorText || 'Gagal mengirim pengajuan.', true);
             }
         } catch (error) {
-            console.error(error);
+            console.error("Error dari frontend:", error);
             showNotification('Gagal terhubung ke server.', true);
         }
     };
