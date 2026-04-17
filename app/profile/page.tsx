@@ -12,7 +12,7 @@ interface UserData {
     username?: string;
     phoneNumber?: string;
     address?: string;
-    verificationStatus?: string;
+    kycStatus?: string;
 }
 
 export default function ProfilePage() {
@@ -47,6 +47,7 @@ export default function ProfilePage() {
             setFullName(parsedUser.fullName || '');
             setPhoneNumber(parsedUser.phoneNumber || '');
             setAddress(parsedUser.address || '');
+            setVerificationStatus(parsedUser.kycStatus || 'UNVERIFIED');
 
             if (!parsedUser.username && parsedUser.email) {
                 setUsername(parsedUser.email.split('@')[0]);
@@ -83,9 +84,9 @@ export default function ProfilePage() {
 
         switch (verificationStatus) {
             case 'VERIFIED':
-                return <span className={`${styles.badge} ${styles.badgeVerified}`}>Verified Jastiper</span>;
-            case 'PENDING':
-                return <span className={`${styles.badge} ${styles.badgePending}`}>Pending Verification</span>;
+                return <span className={`${styles.badge} ${styles.badgeVerified}`}>Verified</span>;
+            case 'PENDING_VERIFICATION':
+                return <span className={`${styles.badge} ${styles.badgePending}`}>Pending</span>;
             case 'UNVERIFIED':
             default:
                 return <span className={`${styles.badge} ${styles.badgeUnverified}`}>Unverified</span>;
