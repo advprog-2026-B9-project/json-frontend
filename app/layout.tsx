@@ -21,7 +21,8 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body
-            className={`${poppins.variable} antialiased`} // 3. Masukkan variabel Poppins
+            className={`${poppins.variable} antialiased`}
+            suppressHydrationWarning
         >
         {children}
         </body>
