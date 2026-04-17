@@ -503,8 +503,19 @@ export default function WalletPage() {
             return;
         }
 
+        if (activeAction === "withdraw" && amount > balance) {
+            setApiNotice("Saldo tidak cukup!");
+            return;
+        }
+
         await processWalletAction(activeAction, Math.floor(amount));
     };
+
+    const parsedInputAmount = Number(inputAmount);
+    const isInsufficientWithdrawBalance = activeAction === "withdraw"
+        && Number.isFinite(parsedInputAmount)
+        && parsedInputAmount > 0
+        && parsedInputAmount > balance;
 
     const visibleTransactions = showAllTransactions ? transactions : transactions.slice(0, 4);
 
@@ -613,12 +624,20 @@ export default function WalletPage() {
                             value={inputAmount}
                             onChange={(event) => setInputAmount(event.target.value)}
                         />
+                        {isInsufficientWithdrawBalance && (
+                            <p className={styles.modalWarning}>Saldo tidak cukup!</p>
+                        )}
 
                         <div className={styles.modalActionGroup}>
                             <button type="button" className={styles.cancelButton} onClick={closeActionModal} disabled={isSubmitting}>
                                 Batal
                             </button>
-                            <button type="button" className={styles.confirmButton} onClick={handleConfirmAction} disabled={isSubmitting}>
+                            <button
+                                type="button"
+                                className={styles.confirmButton}
+                                onClick={handleConfirmAction}
+                                disabled={isSubmitting || isInsufficientWithdrawBalance}
+                            >
                                 {isSubmitting ? "Processing..." : "Konfirmasi"}
                             </button>
                         </div>

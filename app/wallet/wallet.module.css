@@ -257,6 +257,13 @@
   box-shadow: 0 0 0 3px rgba(138, 71, 255, 0.15);
 }
 
+.modalWarning {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: #d32f2f;
+  font-weight: 600;
+}
+
 .modalActionGroup {
   margin-top: 18px;
   display: flex;
