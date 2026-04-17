@@ -203,6 +203,93 @@
   height: 30px;
 }
 
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 18, 24, 0.48);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40;
+  padding: 20px;
+}
+
+.modalCard {
+  width: min(460px, 100%);
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 18px 44px rgba(22, 26, 50, 0.24);
+  padding: 24px;
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 24px;
+  color: #1b1e2b;
+}
+
+.modalDescription {
+  margin: 10px 0 18px;
+  color: #656b7d;
+  font-size: 15px;
+}
+
+.inputLabel {
+  display: block;
+  font-size: 14px;
+  color: #4f5568;
+  margin-bottom: 8px;
+}
+
+.amountInput {
+  width: 100%;
+  border: 1px solid #d4d8e4;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 17px;
+  color: #1f2330;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.amountInput:focus {
+  border-color: #8a47ff;
+  box-shadow: 0 0 0 3px rgba(138, 71, 255, 0.15);
+}
+
+.modalActionGroup {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancelButton,
+.confirmButton {
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cancelButton {
+  border: 1px solid #ced4e1;
+  background: #ffffff;
+  color: #4d5364;
+}
+
+.confirmButton {
+  border: 0;
+  background: linear-gradient(110deg, #802ef4, #8f42ff);
+  color: #ffffff;
+}
+
+.cancelButton:disabled,
+.confirmButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .transactionSection {
   width: min(1040px, calc(100% - 40px));
   margin: 66px auto 0;
@@ -532,5 +619,23 @@
   .statusBadge {
     margin-top: 6px;
     font-size: 11px;
+  }
+
+  .modalCard {
+    border-radius: 16px;
+    padding: 20px;
+  }
+
+  .modalTitle {
+    font-size: 21px;
+  }
+
+  .modalActionGroup {
+    justify-content: stretch;
+  }
+
+  .cancelButton,
+  .confirmButton {
+    flex: 1;
   }
 }
