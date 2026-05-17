@@ -172,6 +172,7 @@
 .toastError {
     background-color: var(--color-danger);
     border-left: 5px solid #d63031;
+}
 
 .toastSuccess {
     background-color: var(--color-success);
@@ -205,4 +206,4 @@
         top: 30px;
         opacity: 1;
     }
-}}
+}
