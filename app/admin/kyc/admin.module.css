@@ -1,0 +1,170 @@
+.pageContainer {
+    --color-primary-light: #8B9DE0;
+    --color-primary: #9747FF;
+    --color-bg-light: #F0F4FF;
+    --color-white: #FFFFFF;
+    --color-text-dark: #1E1E24;
+    --color-card-bg: #F4F7FE; /* Warna latar baris list */
+
+    min-height: 100vh;
+    background-color: var(--color-bg-light);
+    position: relative;
+    padding-bottom: 50px;
+    color: var(--color-text-dark);
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.banner {
+    width: 100%;
+    height: 280px;
+    background: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
+}
+
+.card {
+    margin: -80px auto 0 auto;
+    background-color: var(--color-white);
+    border-radius: 20px;
+    padding: 40px 100px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.tabsContainer {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 40px;
+}
+
+.tab {
+    padding: 12px 0;
+    width: 150px;
+
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s ease;
+
+    text-align: center;
+}
+
+.tab:hover {
+    opacity: 0.9;
+}
+
+.tabActive {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+
+.tabInactive {
+    background-color: var(--color-primary-light);
+    color: var(--color-white);
+}
+
+.headerTitle {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 30px;
+    color: var(--color-text-dark);
+}
+
+.listContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.listItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--color-card-bg);
+    border-radius: 12px;
+    padding: 16px 24px;
+}
+
+.itemLeft {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    width: 40%;
+}
+
+.profileImage {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.infoStack {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nik {
+    font-size: 16px;
+    color: var(--color-text-dark);
+}
+
+.name {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-text-dark);
+}
+
+.email {
+    font-size: 13px;
+    color: #6B7280;
+}
+
+.itemCenter {
+    width: 20%;
+    text-align: center;
+}
+
+.linkKTP {
+    color: var(--color-primary-light);
+    text-decoration: underline;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Kanan: Tombol Action */
+.itemRight {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 24px;
+    width: 40%;
+}
+
+.rejectBtn {
+    background: none;
+    border: none;
+    color: var(--color-text-dark);
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.acceptBtn {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.acceptBtn:hover {
+    opacity: 0.9;
+}

@@ -42,7 +42,14 @@ export default function HomePage() {
     return (
         <div className={styles.pageContainer}>
             <nav className={styles.navbar}>
-                <div className={styles.logo}>JSON</div>
+                <div className={styles.logoWrapper}>
+                    <div className={styles.logoScaled}>
+                        <div className={`${styles.bgText} ${styles.letterJ}`}>J</div>
+                        <div className={`${styles.bgText} ${styles.letterS}`}>S</div>
+                        <div className={`${styles.bgText} ${styles.letterO}`}>O</div>
+                        <div className={`${styles.bgText} ${styles.letterN}`}>N</div>
+                    </div>
+                </div>
 
                 <div className={styles.searchWrapper}>
                     <div className={styles.searchBar}>
@@ -55,12 +62,12 @@ export default function HomePage() {
                             placeholder="Search"
                             className={styles.searchInput}
                         />
-                    </div>
+                    </div>  
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     {isAdmin && (
-                        <Link href="/admin/dashboard" className={styles.adminButton}>
+                        <Link href="/admin/kyc" className={styles.adminButton}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: '8px'}}>
                                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                             </svg>
