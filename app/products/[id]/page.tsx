@@ -24,6 +24,22 @@ export default function ProductDetailPage() {
 
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const [loggedInUsername, setLoggedInUsername] = useState<string>('');
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '', redirectPath: '' });
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            try {
+                const userData = JSON.parse(storedUser);
+                if (userData && userData.username) {
+                    setLoggedInUsername(userData.username);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    }, []);
 
     useEffect(() => {
         if (!id) return;
@@ -35,34 +51,47 @@ export default function ProductDetailPage() {
                     const data = await response.json();
                     setProduct(data);
                 } else {
-                    alert("Produk tidak ditemukan.");
-                    router.push('/products');
+                    setModal({
+                        isOpen: true,
+                        title: "Produk Tidak Ditemukan",
+                        message: "Produk yang Anda cari tidak tersedia atau telah dihapus.",
+                        redirectPath: '/products'
+                    });
                 }
             } catch (error) {
-                console.error("Gagal mengambil detail produk:", error);
+                setModal({
+                    isOpen: true,
+                    title: "Koneksi Bermasalah",
+                    message: "Gagal mengambil detail produk. Silakan coba lagi.",
+                    redirectPath: '/products'
+                });
             } finally {
                 setLoading(false);
             }
         };
 
         fetchProductDetail();
-    }, [id, router]);
+    }, [id, API_URL]);
 
     const handleCheckout = () => {
-        const storedUser = localStorage.getItem('user');
-        if (!storedUser) {
-            alert("Anda harus login sebagai Titipers untuk membeli barang.");
-            router.push('/login');
+        if (!loggedInUsername) {
+            setModal({
+                isOpen: true,
+                title: "Akses Ditolak",
+                message: "Anda harus login sebagai Titipers untuk membeli barang.",
+                redirectPath: '/login'
+            });
             return;
         }
-
-        const userData = JSON.parse(storedUser);
-        if (userData?.username === product?.ownerUsername) {
-            alert("Constraint Error: Jastiper tidak boleh membeli barangnya sendiri.");
-            return;
-        }
-
         router.push(`/order/checkout?productId=${id}`);
+    };
+
+    const handleCloseModal = () => {
+        const path = modal.redirectPath;
+        setModal({ ...modal, isOpen: false });
+        if (path) {
+            router.push(path);
+        }
     };
 
     if (loading) {
@@ -74,57 +103,73 @@ export default function ProductDetailPage() {
         );
     }
 
-    if (!product) return null;
+    if (!product && !modal.isOpen) return null;
+
+    const isOwner = product ? loggedInUsername === product.ownerUsername : false;
 
     return (
         <div className={styles.pageContainer}>
+            {modal.isOpen && (
+                <div className={styles.modalBackdrop}>
+                    <div className={styles.modalCard}>
+                        <h2 className={styles.modalTitle}>{modal.title}</h2>
+                        <p className={styles.modalMessage}>{modal.message}</p>
+                        <button className={styles.modalActionBtn} onClick={handleCloseModal}>
+                            Mengerti
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className={styles.banner} style={{ height: '200px' }}></div>
             
-            <div className={styles.detailContainer}>
-                <div className={styles.detailImage}></div>
-                
-                <div className={styles.detailInfo}>
-                    <h1 className={styles.detailTitle}>{product.name}</h1>
-                    <div className={styles.detailPrice}>
-                        Rp {product.price.toLocaleString('id-ID')}
-                    </div>
+            {product && (
+                <div className={styles.detailContainer}>
+                    <div className={styles.detailImage}></div>
                     
-                    <p className={styles.detailDesc}>{product.description}</p>
-                    
-                    <div className={styles.specBox}>
-                        <div className={styles.metaItem}>
-                            Jastiper
-                            <strong>@{product.ownerUsername}</strong>
+                    <div className={styles.detailInfo}>
+                        <h1 className={styles.detailTitle}>{product.name}</h1>
+                        <div className={styles.detailPrice}>
+                            Rp {product.price.toLocaleString('id-ID')}
                         </div>
-                        <div className={styles.metaItem}>
-                            Rating
-                            <strong>★ {product.averageRating > 0 ? product.averageRating.toFixed(1) : 'Belum ada ulasan'} ({product.totalReviews})</strong>
+                        
+                        <p className={styles.detailDesc}>{product.description}</p>
+                        
+                        <div className={styles.specBox}>
+                            <div className={styles.metaItem}>
+                                Jastiper
+                                <strong>@{product.ownerUsername}</strong>
+                            </div>
+                            <div className={styles.metaItem}>
+                                Rating
+                                <strong>★ {product.averageRating > 0 ? product.averageRating.toFixed(1) : 'Belum ada ulasan'} ({product.totalReviews})</strong>
+                            </div>
+                            <div className={styles.metaItem}>
+                                Negara Asal
+                                <strong>{product.originCountry}</strong>
+                            </div>
+                            <div className={styles.metaItem}>
+                                Tiba di Indonesia
+                                <strong>{product.arrivalDate}</strong>
+                            </div>
+                            <div className={styles.metaItem}>
+                                Sisa Kuota
+                                <strong style={{ color: product.stock > 0 ? 'inherit' : '#FF4757' }}>
+                                    {product.stock > 0 ? `${product.stock} pcs` : 'Habis Terjual'}
+                                </strong>
+                            </div>
                         </div>
-                        <div className={styles.metaItem}>
-                            Negara Asal
-                            <strong>{product.originCountry}</strong>
-                        </div>
-                        <div className={styles.metaItem}>
-                            Tiba di Indonesia
-                            <strong>{product.arrivalDate}</strong>
-                        </div>
-                        <div className={styles.metaItem}>
-                            Sisa Kuota
-                            <strong style={{ color: product.stock > 0 ? 'inherit' : '#FF4757' }}>
-                                {product.stock > 0 ? `${product.stock} pcs` : 'Habis Terjual'}
-                            </strong>
-                        </div>
-                    </div>
 
-                    <button 
-                        className={styles.buyBtn} 
-                        onClick={handleCheckout}
-                        disabled={product.stock <= 0}
-                    >
-                        {product.stock > 0 ? 'Checkout Barang' : 'Stok Habis'}
-                    </button>
+                        <button 
+                            className={styles.buyBtn} 
+                            onClick={handleCheckout}
+                            disabled={product.stock <= 0 || isOwner}
+                        >
+                            {isOwner ? 'Barang Anda Sendiri' : product.stock > 0 ? 'Checkout Barang' : 'Stok Habis'}
+                        </button>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }
