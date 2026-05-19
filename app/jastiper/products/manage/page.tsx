@@ -19,7 +19,15 @@ function ManageProductForm() {
         originCountry: '',
         arrivalDate: ''
     });
+    
     const [fetching, setFetching] = useState<boolean>(false);
+    
+    const [modal, setModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        redirectPath: ''
+    });
 
     useEffect(() => {
         if (isEditMode) {
@@ -38,22 +46,40 @@ function ManageProductForm() {
                             arrivalDate: data.arrivalDate || ''
                         });
                     } else {
-                        alert("Gagal mengambil detail produk.");
-                        router.push('/jastiper/products');
+                        setModal({
+                            isOpen: true,
+                            title: "Gagal Memuat",
+                            message: "Gagal mengambil detail produk. Produk mungkin telah dihapus.",
+                            redirectPath: '/jastiper/products'
+                        });
                     }
                 } catch (error) {
                     console.error(error);
+                    setModal({
+                        isOpen: true,
+                        title: "Koneksi Bermasalah",
+                        message: "Tidak dapat terhubung ke server.",
+                        redirectPath: '/jastiper/products'
+                    });
                 } finally {
                     setFetching(false);
                 }
             };
             fetchProductDetail();
         }
-    }, [productId, isEditMode, router]);
+    }, [productId, isEditMode, API_URL]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleCloseModal = () => {
+        const path = modal.redirectPath;
+        setModal({ ...modal, isOpen: false });
+        if (path) {
+            router.push(path);
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -61,8 +87,12 @@ function ManageProductForm() {
 
         const storedUser = localStorage.getItem('user');
         if (!storedUser) {
-            alert("Sesi Anda telah habis. Silakan login kembali.");
-            router.push('/login');
+            setModal({
+                isOpen: true,
+                title: "Sesi Berakhir",
+                message: "Sesi Anda telah habis. Silakan login kembali.",
+                redirectPath: '/login'
+            });
             return;
         }
 
@@ -74,13 +104,34 @@ function ManageProductForm() {
                 throw new Error("Username tidak ditemukan");
             }
         } catch (error) {
-            alert("Sesi tidak valid. Silakan login kembali.");
-            router.push('/login');
+            setModal({
+                isOpen: true,
+                title: "Sesi Tidak Valid",
+                message: "Data sesi Anda rusak. Silakan login kembali.",
+                redirectPath: '/login'
+            });
             return;
         }
 
-        if (parseInt(formData.stock) < 0) return alert("Stok minimal bernilai 0");
-        if (parseFloat(formData.price) < 0) return alert("Harga tidak boleh negatif");
+        if (parseInt(formData.stock) < 0) {
+            setModal({
+                isOpen: true,
+                title: "Validasi Gagal",
+                message: "Stok minimal bernilai 0",
+                redirectPath: ''
+            });
+            return;
+        }
+        
+        if (parseFloat(formData.price) < 0) {
+            setModal({
+                isOpen: true,
+                title: "Validasi Gagal",
+                message: "Harga tidak boleh negatif",
+                redirectPath: ''
+            });
+            return;
+        }
 
         const payload = {
             ...formData,
@@ -103,15 +154,29 @@ function ManageProductForm() {
             });
 
             if (response.ok) {
-                alert(isEditMode ? "✅ Produk berhasil diperbarui!" : "✅ Produk berhasil ditambahkan!");
-                router.push('/jastiper/products');
+                setModal({
+                    isOpen: true,
+                    title: "Berhasil!",
+                    message: isEditMode ? "Produk berhasil diperbarui!" : "Produk berhasil ditambahkan ke katalog!",
+                    redirectPath: '/jastiper/products'
+                });
             } else {
                 const errorText = await response.text();
-                alert("Gagal menyimpan data: " + errorText);
+                setModal({
+                    isOpen: true,
+                    title: "Gagal Menyimpan",
+                    message: `Gagal menyimpan data: ${errorText}`,
+                    redirectPath: ''
+                });
             }
         } catch (error) {
             console.error(error);
-            alert("Terjadi kesalahan koneksi sistem.");
+            setModal({
+                isOpen: true,
+                title: "Kesalahan Sistem",
+                message: "Terjadi kesalahan koneksi sistem saat menyimpan data.",
+                redirectPath: ''
+            });
         }
     };
 
@@ -128,6 +193,26 @@ function ManageProductForm() {
 
     return (
         <div className={styles.pageContainer}>
+            {/* Modal Handler */}
+            {modal.isOpen && (
+                <div className={styles.modalBackdrop}>
+                    <div className={styles.modalCard}>
+                        <h2 className={styles.modalTitle}>{modal.title}</h2>
+                        <p className={styles.modalMessage} style={{ textAlign: 'center', marginBottom: '24px' }}>
+                            {modal.message}
+                        </p>
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <button 
+                                className={styles.primaryBtn}
+                                onClick={handleCloseModal}
+                            >
+                                Mengerti
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className={styles.banner}></div>
             <div className={styles.card}>
                 <h1 className={styles.headerTitle} style={{ marginBottom: '30px' }}>
@@ -211,7 +296,7 @@ function ManageProductForm() {
 
 export default function ManageProductPage() {
     return (
-        <Suspense fallback={<p>Memuat formulir...</p>}>
+        <Suspense fallback={<div className={styles.pageContainer}><p className={styles.centerMessage}>Memuat formulir...</p></div>}>
             <ManageProductForm />
         </Suspense>
     );
