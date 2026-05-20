@@ -44,6 +44,8 @@ export default function LoginCard() {
                 console.log('Login sukses!', userData);
 
                 localStorage.setItem('user', JSON.stringify(userData));
+                localStorage.setItem("userEmail", userData.email);
+                localStorage.setItem("userRole", userData.role);
                 setToastMessage(`Login berhasil! Selamat datang, ${userData.fullName || userData.username}.`);
                 setTimeout(() => {
                     router.push('/');
