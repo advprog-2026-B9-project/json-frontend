@@ -24,7 +24,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <Link href="/admin/users" className={`${styles.tab} ${pathname === '/admin/users' ? styles.tabActive : styles.tabInactive}`}>
                         Manage Users
                     </Link>
-                    <Link href="/admin/products" className={`${styles.tab} ${pathname === '/admin/products' ? styles.tabActive : styles.tabInactive}`}>
+                    <Link href="/admin/products" className={`${styles.tab} ${pathname.match('/admin/products') ? styles.tabActive : styles.tabInactive}`}>
                         Manage Products
                     </Link>
                 </div>
