@@ -9,10 +9,11 @@ import sharedStyles from '@/components/shared.module.css';
 
 function AdminEditProductForm() {
     const router = useRouter();
+    
     const searchParams = useSearchParams();
     const productId = searchParams.get('id');
 
-    const { isLoaded, isAuthenticated } = useAuth();
+    const { isLoaded, isAuthenticated, user} = useAuth();
     const { modal, openModal, closeModal } = useModal();
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
@@ -29,10 +30,14 @@ function AdminEditProductForm() {
     const [fetching, setFetching] = useState<boolean>(true);
 
     useEffect(() => {
-        if (isLoaded && !isAuthenticated) {
-            router.push('/login');
+        if (isLoaded) {
+            if (!isAuthenticated) {
+                router.push('/login');
+            } else if (user?.role !== 'ADMIN') {
+                router.push('/');
+            }
         }
-    }, [isLoaded, isAuthenticated, router]);
+    }, [isLoaded, isAuthenticated, user, router]);
 
     useEffect(() => {
         if (!productId) {

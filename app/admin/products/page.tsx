@@ -22,7 +22,7 @@ interface ProductDetailResponse {
 
 export default function ManageProductsPage() {
     const router = useRouter();
-    const { isLoaded, isAuthenticated } = useAuth();
+    const { isLoaded, isAuthenticated, user} = useAuth();
     const { modal, openModal, closeModal } = useModal();
     
     const [products, setProducts] = useState<ProductDetailResponse[]>([]);
@@ -35,10 +35,14 @@ export default function ManageProductsPage() {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
     useEffect(() => {
-        if (isLoaded && !isAuthenticated) {
-            router.push('/login');
+        if (isLoaded) {
+            if (!isAuthenticated) {
+                router.push('/login');
+            } else if (user?.role !== 'ADMIN') {
+                router.push('/');
+            }
         }
-    }, [isLoaded, isAuthenticated, router]);
+    }, [isLoaded, isAuthenticated, user, router]);
 
     const fetchAllProducts = async (nameQuery = '', jastiperQuery = '') => {
         try {
