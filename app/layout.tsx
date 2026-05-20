@@ -9,8 +9,11 @@ const poppins = Poppins({
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html lang="en" className={poppins.variable}>
-        <body>
+        <html lang="en">
+        <body
+            className={`${poppins.variable} antialiased`}
+            suppressHydrationWarning
+        >
         {children}
         </body>
         </html>

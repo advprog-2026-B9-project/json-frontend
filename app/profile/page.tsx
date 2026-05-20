@@ -216,7 +216,7 @@ export default function ProfilePage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    email: email,
+                    email: userEmail,
                     fullName: ktpFullName,
                     nikKtp: ktpNIK,
                     ktpImageUrl: ktpImageUrl
@@ -225,7 +225,6 @@ export default function ProfilePage() {
 
             if (response.ok) {
                 const updatedUser = await response.json();
-
                 localStorage.setItem('user', JSON.stringify(updatedUser));
 
                 setVerificationStatus(updatedUser.kycStatus);
@@ -236,7 +235,7 @@ export default function ProfilePage() {
                 showNotification(errorText || 'Gagal mengirim pengajuan.', true);
             }
         } catch (error) {
-            console.error(error);
+            console.error("Error dari frontend:", error);
             showNotification('Gagal terhubung ke server.', true);
         }
     };
