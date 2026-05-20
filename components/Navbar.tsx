@@ -60,7 +60,7 @@ const Navbar = () => {
       { href: '/admin/kyc', label: 'Verifikasi KYC' },
       { href: '/admin/users', label: 'Manajemen User' },
     ];
-  } else if (userRole === 'JASTIPERS') {
+  } else if (userRole === 'JASTIPER') {
     navLinks = [
       { href: '/', label: 'Home' },
       { href: '/jastiper/products', label: 'Dashboard Jastiper' },
