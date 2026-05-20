@@ -20,7 +20,7 @@ interface Product {
 
 export default function JastiperDashboard() {
     const router = useRouter();
-    const { username, isLoaded, isAuthenticated } = useAuth();
+    const { username, isLoaded, isAuthenticated, user } = useAuth();
     const { modal, openModal, closeModal } = useModal();
     
     const [products, setProducts] = useState<Product[]>([]);
@@ -30,8 +30,14 @@ export default function JastiperDashboard() {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
     useEffect(() => {
-        if (isLoaded && !isAuthenticated) router.push('/login');
-    }, [isLoaded, isAuthenticated, router]);
+        if (isLoaded) {
+            if (!isAuthenticated) {
+                router.push('/login');
+            } else if (user?.role !== 'JASTIPER') {
+                router.push('/');
+            }
+        }
+    }, [isLoaded, isAuthenticated, user, router]);
 
     const fetchMyProducts = async () => {
         if (!username) return;

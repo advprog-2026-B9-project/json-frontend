@@ -2,13 +2,16 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from '../jastiper.module.css';
+import { useAuth } from '@/hooks/useAuth';
 
 function ManageProductForm() {
     const router = useRouter();
+    const { isLoaded, isAuthenticated, user } = useAuth();
+    
     const searchParams = useSearchParams();
     const productId = searchParams.get('id');
     const isEditMode = !!productId;
-
+    
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
     
     const [formData, setFormData] = useState({
@@ -28,6 +31,16 @@ function ManageProductForm() {
         message: '',
         redirectPath: ''
     });
+
+    useEffect(() => {
+        if (isLoaded) {
+            if (!isAuthenticated) {
+                router.push('/login');
+            } else if (user?.role !== 'JASTIPER') {
+                router.push('/');
+            }
+        }
+    }, [isLoaded, isAuthenticated, user, router]);
 
     useEffect(() => {
         if (isEditMode) {
