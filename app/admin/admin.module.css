@@ -1,0 +1,328 @@
+.pageContainer {
+    --color-primary-light: #802ef4;
+    --color-primary: #8f42ff;
+    --color-bg-light: #f3f5fb;
+    --color-white: #ffffff;
+    --color-text-dark: #1b1e2b;
+    --color-card-bg: #ffffff;
+    --color-gray-text: #656b7d;
+
+    min-height: 100vh;
+    font-family: var(--font-poppins), sans-serif;
+    background-color: var(--color-bg-light);
+    position: relative;
+    padding-bottom: 50px;
+    color: var(--color-text-dark);
+}
+
+.banner {
+    width: 100%;
+    height: 280px;
+    background: linear-gradient(115deg, #7a34f2 0%, #6b4ef7 45%, #4fa9f8 100%);
+}
+
+.backButton {
+    position: absolute;
+    top: 30px;
+    left: 40px;
+    color: var(--color-white);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 10;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.backButton:hover {
+    opacity: 0.8;
+    transform: translateX(-4px);
+}
+
+.card {
+    margin: -80px auto 0 auto;
+    background-color: var(--color-white);
+    border-radius: 28px; /* Disesuaikan dengan desain dompet yang lebih membulat */
+    padding: 40px 60px; /* Sedikit dirapatkan agar responsif */
+    max-width: 1100px;
+    position: relative;
+    box-shadow: 0 12px 30px rgba(26, 33, 72, 0.16); /* Soft modern shadow */
+}
+
+/* =========================================
+   TABS NAVIGATION
+========================================= */
+.tabsContainer {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 40px;
+}
+
+.tab {
+    padding: 12px 0;
+    width: 160px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 180ms ease;
+    text-align: center;
+    font-family: var(--font-poppins), sans-serif;
+}
+
+.tabActive {
+    background: linear-gradient(110deg, var(--color-primary-light), var(--color-primary));
+    color: var(--color-white);
+    box-shadow: 0 8px 20px rgba(107, 46, 244, 0.25);
+    border: none;
+}
+
+.tabInactive {
+    background-color: transparent;
+    color: var(--color-gray-text);
+    border: 1px solid #ced4e1;
+}
+
+.tabInactive:hover {
+    border-color: #8a47ff;
+    color: #8a47ff;
+    background-color: #fafbff;
+}
+
+/* =========================================
+   LIST ITEMS (KYC & Monitoring Products)
+========================================= */
+.headerTitle {
+    font-family: var(--font-poppins), sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 30px;
+    color: var(--color-text-dark);
+}
+
+.listContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.listItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--color-card-bg);
+    border: 1px solid #e3e5ec;
+    border-radius: 18px;
+    padding: 20px 24px;
+    box-shadow: 0 8px 24px rgba(24, 33, 76, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.listItem:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(24, 33, 76, 0.1);
+    background-color: #fafbff;
+}
+
+.itemLeft {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: 40%;
+}
+
+.profileImage {
+    width: 65px;
+    height: 65px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #e3e5ec;
+}
+
+.infoStack {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nik {
+    font-size: 14px;
+    color: var(--color-gray-text);
+    font-weight: 500;
+}
+
+.name {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-text-dark);
+    margin-bottom: 2px;
+}
+
+.email {
+    font-size: 13px;
+    color: #878c99;
+}
+
+.itemCenter {
+    width: 20%;
+    text-align: center;
+}
+
+.linkKTP {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background-color: #f4ecff;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.linkKTP:hover {
+    background-color: #ebd9ff;
+    color: #7a2df0;
+}
+
+.itemRight {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    width: 40%;
+}
+
+/* =========================================
+   ACTION BUTTONS (Khusus Admin KYC)
+========================================= */
+.rejectBtn, .acceptBtn {
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+    font-family: var(--font-poppins), sans-serif;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rejectBtn {
+    background-color: #ffffff;
+    color: #FF4757;
+    border: 1px solid #FF4757;
+}
+
+.rejectBtn:hover {
+    background-color: #fff0f1;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 71, 87, 0.15);
+}
+
+.acceptBtn {
+    background: linear-gradient(110deg, #802ef4, #8f42ff);
+    color: var(--color-white);
+    box-shadow: 0 10px 22px rgba(107, 46, 244, 0.25);
+}
+
+.acceptBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(107, 46, 244, 0.35);
+}
+
+/* Search Products */
+
+.searchCard {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 30px;
+    background-color: var(--color-card-bg);
+    padding: 20px 24px;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(24, 33, 76, 0.04);
+    align-items: flex-end;
+    border: 1px solid #e3e5ec;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-dark);
+}
+
+.inputField {
+    background-color: var(--color-bg-light);
+    border: 1px solid #ced4e1;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 14px;
+    outline: none;
+    color: var(--color-text-dark);
+    transition: border-color 150ms ease;
+}
+
+.inputField:focus {
+    border-color: var(--color-primary);
+    background-color: var(--color-white);
+}
+
+/* Edit Form */
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 20px;
+}
+
+.fullWidth {
+    grid-column: span 2;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-dark);
+}
+
+.inputField {
+    background-color: #ffffff;
+    border: 1px solid #ced4e1;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: var(--color-text-dark);
+    outline: none;
+    transition: all 180ms ease;
+}
+
+.inputField:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(143, 57, 223, 0.15);
+}
+
+.formActions {
+    margin-top: 32px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+}

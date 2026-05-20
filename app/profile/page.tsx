@@ -34,6 +34,7 @@ export default function ProfilePage() {
     const [isKycModalOpen, setIsKycModalOpen] = useState(false);
     const [ktpFullName, setKtpFullName] = useState('');
     const [ktpNIK, setKtpNIK] = useState('');
+    const [ktpImageUrl, setKtpImageUrl] = useState('');
 
     const loadUserData = () => {
         const storedUser = localStorage.getItem('user');
@@ -75,6 +76,36 @@ export default function ProfilePage() {
 
     useEffect(() => {
         loadUserData();
+
+        const fetchLatestData = async () => {
+            const storedUser = localStorage.getItem('user');
+            if (!storedUser) return;
+
+            const parsedUser = JSON.parse(storedUser);
+            if (!parsedUser.email) return;
+
+            try {
+                const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+                const response = await fetch(`${API_URL}/auth/user?email=${encodeURIComponent(parsedUser.email)}`);
+
+                if (response.ok) {
+                    const latestData = await response.json();
+
+                    localStorage.setItem('user', JSON.stringify(latestData));
+
+                    setVerificationStatus(latestData.kycStatus || 'UNVERIFIED');
+                    setRole(latestData.role || 'TITIPERS');
+                    setFullName(latestData.fullName || '');
+                    setPhoneNumber(latestData.phoneNumber || '');
+                    setAddress(latestData.address || '');
+                    setUsername(latestData.username || latestData.email.split('@')[0]);
+                }
+            } catch (error) {
+                console.error("Gagal sinkronisasi data dari server:", error);
+            }
+        };
+
+        fetchLatestData();
     }, []);
 
     const renderBadge = () => {
@@ -151,6 +182,7 @@ export default function ProfilePage() {
         setIsKycModalOpen(false);
         setKtpFullName('');
         setKtpNIK('');
+        setKtpImageUrl('');
     };
 
     const handleKycSubmit = async () => {
@@ -161,6 +193,11 @@ export default function ProfilePage() {
 
         if (ktpNIK.length !== 16) {
             showNotification('NIK harus terdiri dari tepat 16 digit angka!', true);
+            return;
+        }
+
+        if (!ktpImageUrl.trim()) {
+            showNotification('Link Foto KTP wajib diisi!', true);
             return;
         }
 
@@ -182,7 +219,7 @@ export default function ProfilePage() {
                     email: userEmail,
                     fullName: ktpFullName,
                     nikKtp: ktpNIK,
-                    ktpImageUrl: 'https://dummyimage.com/ktp-placeholder.jpg'
+                    ktpImageUrl: ktpImageUrl
                 }),
             });
 
@@ -345,6 +382,17 @@ export default function ProfilePage() {
                                 onChange={handleNikChange}
                                 maxLength={16}
                                 placeholder="Masukkan 16 digit NIK"
+                            />
+                        </div>
+
+                        <div className={styles.inputGroup} style={{ width: '100%' }}>
+                            <label className={styles.label}>Link Foto KTP</label>
+                            <input
+                                type="url"
+                                className={styles.inputField}
+                                value={ktpImageUrl}
+                                onChange={(e) => setKtpImageUrl(e.target.value)}
+                                placeholder="https://contoh-link-gambar-ktp.com/foto.jpg"
                             />
                         </div>
 
