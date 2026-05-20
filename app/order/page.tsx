@@ -1,68 +1,166 @@
 "use client";
-import { useEffect, useState } from 'react';
-import axios from 'axios';
 
-export default function ProductPage() {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
+import { useEffect, useState } from "react";
+import styles from "./order.module.css";
 
-    // 1. TAMPILIN PRODUCT DARI DB
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const response = await axios.get('http://localhost:8080/api/v1/products');
-                setProducts(response.data);
-            } catch (error) {
-                console.error("Gagal ambil produk:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProducts();
-    }, []);
+interface Order {
+  id: string;
+  productId: string;
+  quantity: number;
+  totalPrice: number;
+  shippingAddress: string;
+  status: string;
+  trackingNumber?: string;
+  jastiperRating?: number;
+  productRating?: number;
+}
 
-    const handleCheckout = async (product: { id: any; ownerId: any; price: any; }) => {
-        const orderData = {
-            productId: product.id,
-            titiperId: "ISI_UUID_SULTAN_KAMU", // UUID User yang lagi login
-            jastiperId: product.ownerId, // UUID Penjual
-            quantity: 1,
-            totalPrice: product.price,
-            shippingAddress: "Depok, Jawa Barat"
-        };
+export default function OrderPage() {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
 
-        try {
-            const res = await axios.post('http://localhost:8080/api/orders/checkout', orderData);
-            alert("Checkout Berhasil! Saldo & Stok otomatis terpotong.");
-            // Refresh data produk supaya stok terbaru kelihatan
-            window.location.reload(); 
-        } catch (err) {
-            alert("Checkout Gagal: " + (err.response?.data?.message || "Cek saldo atau stok!"));
-        }
-    };
+  // TODO: Nanti ganti dengan UUID Titiper yang asli saat login sudah jalan
+  const dummyTitiperId = "b9a0777e-c35d-49ca-ad25-015419c7bec6"; 
 
-    if (loading) return <p>Loading barang-barang kece...</p>;
+  useEffect(() => {
+    fetchOrders();
+  }, []);
 
-    return (
-        <div className="p-8">
-            <h1 className="text-2xl font-bold mb-6">Katalog Produk JSON Platform</h1>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {products.map((product: any) => (
-                    <div key={product.id} className="border p-4 rounded-lg shadow">
-                        <h2 className="text-xl font-semibold">{product.name}</h2>
-                        <p className="text-gray-600">{product.description}</p>
-                        <p className="font-bold text-blue-600">Rp {product.price}</p>
-                        <p className="text-sm text-gray-500">Stok: {product.stock}</p>
-                        
-                        <button 
-                            onClick={() => handleCheckout(product)}
-                            className="mt-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full"
-                        >
-                            Beli Sekarang
-                        </button>
-                    </div>
-                ))}
-            </div>
+  const fetchOrders = async () => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/orders/history/${dummyTitiperId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setOrders(data);
+      }
+    } catch (error) {
+      console.error("Gagal mengambil data order:", error);
+    }
+    // setProducts([
+    //   {
+    //     id: "11111111-1111-1111-1111-111111111111",
+    //     name: "Tokyo Banana Premium",
+    //     price: 250000,
+    //     stock: 15,
+    //     jastiperId: "22222222-2222-2222-2222-222222222222",
+    //   },
+    //   {
+    //     id: "33333333-3333-3333-3333-333333333333",
+    //     name: "Garam Gourmet Limited",
+    //     price: 850000,
+    //     stock: 5,
+    //     jastiperId: "44444444-4444-4444-4444-444444444444",
+    //   },
+    // ]);
+    
+    setLoading(false);
+  };
+
+  const handleCancel = async (orderId: string) => {
+    if (!confirm("Yakin mau membatalkan pesanan ini? Uang akan di-refund otomatis.")) return;
+    
+    try {
+      const res = await fetch(`http://localhost:8080/api/orders/${orderId}/cancel`, { 
+        method: "PATCH" 
+      });
+      
+      if (res.ok) {
+        alert("Pesanan berhasil dibatalkan!");
+        fetchOrders(); // Refresh data biar statusnya jadi CANCELLED
+      } else {
+        alert("Gagal membatalkan pesanan. Cek status order.");
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleRating = async (orderId: string) => {
+    // Sederhana pakai prompt dulu (bisa diubah jadi Modal form nanti kalau mau A+)
+    const jastiperRating = prompt("Masukkan rating untuk Pelayanan Jastiper (1-5):");
+    if (!jastiperRating) return;
+
+    const productRating = prompt("Masukkan rating untuk Kualitas Produk (1-5):");
+    if (!productRating) return;
+
+    try {
+      // Panggil endpoint rating yang barusan kita bikin unit test-nya
+      const res = await fetch(`http://localhost:8080/api/orders/${orderId}/rating?jastiperRating=${jastiperRating}&productRating=${productRating}`, {
+        method: "PATCH"
+      });
+
+      if (res.ok) {
+        alert("Terima kasih atas penilaian Anda!");
+        fetchOrders(); // Refresh biar tombol rating hilang
+      } else {
+        alert("Gagal mengirim rating. Pastikan angka 1-5.");
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  if (loading) {
+    return <div className={styles.container}><p>Memuat pesanan...</p></div>;
+  }
+
+  return (
+    <div className={styles.container}>
+      <h1 className={styles.title}>Riwayat Pesanan Saya</h1>
+      
+      {orders.length === 0 ? (
+        <div className={styles.emptyState}>
+          <p>Belum ada pesanan nih. Yuk hunting barang jastip!</p>
         </div>
-    );
+      ) : (
+        orders.map((order) => (
+          <div key={order.id} className={styles.card}>
+            
+            {/* Header: Order ID & Status */}
+            <div className={styles.cardHeader}>
+              <span className={styles.orderId}>ID: {order.id.split('-')[0]}...</span>
+              <span className={`${styles.badge} ${styles[`badge${order.status}`]}`}>
+                {order.status}
+              </span>
+            </div>
+
+            {/* Konten Pesanan */}
+            <div className={styles.details}>
+              <p><strong>Total Harga:</strong> Rp {order.totalPrice.toLocaleString('id-ID')}</p>
+              <p><strong>Jumlah Barang:</strong> {order.quantity} pcs</p>
+              <p><strong>Alamat Pengiriman:</strong> {order.shippingAddress}</p>
+              {order.trackingNumber && (
+                <p><strong>Nomor Resi:</strong> {order.trackingNumber}</p>
+              )}
+            </div>
+
+            {/* Area Tombol Aksi */}
+            <div className={styles.actionGroup}>
+              {/* Tombol Cancel cuma muncul kalau masih PAID */}
+              {order.status === "PAID" && (
+                <button onClick={() => handleCancel(order.id)} className={styles.btnCancel}>
+                  Batalkan Pesanan
+                </button>
+              )}
+
+              {/* Tombol Rating cuma muncul kalau udah COMPLETED dan belum dirating */}
+              {order.status === "COMPLETED" && !order.jastiperRating && (
+                <button onClick={() => handleRating(order.id)} className={styles.btnRate}>
+                  Beri Penilaian
+                </button>
+              )}
+
+              {/* Kalau udah dirating, tampilin Bintangnya */}
+              {order.status === "COMPLETED" && order.jastiperRating && (
+                <p style={{ fontSize: '0.85rem', color: '#10b981', fontWeight: 'bold' }}>
+                  ★ Jastiper: {order.jastiperRating}/5 | ★ Produk: {order.productRating}/5
+                </p>
+              )}
+            </div>
+
+          </div>
+        ))
+      )}
+    </div>
+  );
 }
