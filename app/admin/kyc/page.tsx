@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import styles from '../admin.module.css'; // Path disesuaikan karena file CSS dipindah ke folder admin/
+import React, { useState, useEffect, useCallback } from 'react';
+import styles from '../admin.module.css';
 
 interface User {
     id: string;
@@ -14,34 +14,47 @@ interface User {
 export default function KycPage() {
     const [pendingUsers, setPendingUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
+    const [adminEmail, setAdminEmail] = useState<string>("");
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
-    const fetchUsers = async () => {
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const storedEmail = localStorage.getItem("userEmail") || "";
+            setAdminEmail(storedEmail);
+        }
+    }, []);
+
+    const fetchUsers = useCallback(async () => {
+        if (!adminEmail) return;
+
         try {
             setLoading(true);
-            const response = await fetch(`${API_URL}/auth/admin/kyc/pending`);
+            const response = await fetch(`${API_URL}/auth/admin/kyc/pending?requesterEmail=${adminEmail}`);
             if (response.ok) {
                 const data: User[] = await response.json();
                 setPendingUsers(data);
+            } else {
+                console.error("Gagal memuat data:", await response.text());
             }
         } catch (error) {
             console.error("Gagal mengambil data user:", error);
         } finally {
             setLoading(false);
         }
-    };
+    }, [adminEmail, API_URL]);
 
     useEffect(() => {
         fetchUsers();
-    }, []);
+    }, [fetchUsers]);
 
     const handleReview = async (email: string, isApproved: boolean) => {
         const confirmMsg = isApproved ? "Apakah Anda yakin ingin MENYETUJUI user ini?" : "Apakah Anda yakin ingin MENOLAK user ini?";
         if (!window.confirm(confirmMsg)) return;
 
         try {
-            const response = await fetch(`${API_URL}/auth/admin/kyc/review`, {
+            // Post API juga MENGIRIMKAN requesterEmail
+            const response = await fetch(`${API_URL}/auth/admin/kyc/review?requesterEmail=${adminEmail}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, approved: isApproved }),
@@ -49,7 +62,6 @@ export default function KycPage() {
 
             if (response.ok) {
                 alert(isApproved ? "✅ User berhasil diverifikasi!" : "❌ User ditolak.");
-                // Refresh data agar user yang sudah direview hilang dari daftar
                 fetchUsers();
             } else {
                 const msg = await response.text();
@@ -72,7 +84,6 @@ export default function KycPage() {
                     Tidak ada pengajuan verifikasi baru saat ini.
                 </p>
             ) : (
-                /* Daftar Pengajuan KYC dari Backend */
                 <div className={styles.listContainer}>
                     {pendingUsers.map((user) => (
                         <div key={user.id} className={styles.listItem}>
