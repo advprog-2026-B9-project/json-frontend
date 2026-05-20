@@ -341,6 +341,128 @@
     border-left: 5px solid #047857;
 }
 
+.centerText {
+    text-align: center;
+    margin-top: 50px;
+    color: #666;
+}
+
+.centerTextError {
+    text-align: center;
+    margin-top: 50px;
+    color: red;
+    font-weight: bold;
+}
+
+.profileInfoSummary {
+    text-align: center;
+    margin-top: 60px;
+    margin-bottom: 20px;
+}
+
+.publicName {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.publicUsername {
+    font-size: 16px;
+    color: #777;
+    margin: 4px 0 12px 0;
+}
+
+.roleLabel {
+    background-color: #8F39DF;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.bannedBadge {
+    background-color: red;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 8px;
+}
+
+.divider {
+    border: 0;
+    height: 1px;
+    background: #eee;
+    margin: 20px 0;
+}
+
+.infoGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.valueText {
+    font-size: 16px;
+    color: #333;
+    margin: 0;
+}
+
+.jastiperStatsContainer {
+    margin-top: 30px;
+    background-color: #f9f6ff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e8dafc;
+}
+
+.sectionTitle {
+    font-size: 18px;
+    font-weight: bold;
+    color: #5a189a;
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.statCard {
+    background-color: white;
+    padding: 16px;
+    border-radius: 6px;
+    border: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.statLabel {
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 4px;
+}
+
+.statValue {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+.statSubText {
+    font-size: 11px;
+    color: #999;
+    margin-top: 2px;
+}
+
 /* Animations */
 @keyframes fadeIn {
     0% { opacity: 0; }
