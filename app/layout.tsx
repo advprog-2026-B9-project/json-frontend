@@ -1,5 +1,6 @@
 import { Poppins } from 'next/font/google';
 import './globals.css';
+import Navbar from '@/components/Navbar';
 
 const poppins = Poppins({
     subsets: ['latin'],
@@ -9,11 +10,13 @@ const poppins = Poppins({
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
+        
         <html lang="en">
         <body
             className={`${poppins.variable} antialiased`}
             suppressHydrationWarning
         >
+        <Navbar />
         {children}
         </body>
         </html>
