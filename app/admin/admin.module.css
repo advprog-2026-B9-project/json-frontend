@@ -4,20 +4,40 @@
     --color-bg-light: #F0F4FF;
     --color-white: #FFFFFF;
     --color-text-dark: #1E1E24;
-    --color-card-bg: #F4F7FE; /* Warna latar baris list */
+    --color-card-bg: #F4F7FE;
 
     min-height: 100vh;
+    font-family: var(--font-poppins), sans-serif;
     background-color: var(--color-bg-light);
     position: relative;
     padding-bottom: 50px;
     color: var(--color-text-dark);
-    font-family: system-ui, -apple-system, sans-serif;
 }
 
 .banner {
     width: 100%;
     height: 280px;
     background: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
+}
+
+.backButton {
+    position: absolute;
+    top: 30px;
+    left: 40px;
+    color: var(--color-white);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 10;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.backButton:hover {
+    opacity: 0.8;
+    transform: translateX(-4px);
 }
 
 .card {
@@ -37,15 +57,15 @@
 }
 
 .tab {
-    padding: 12px 0;
-    width: 150px;
+    padding: 10px 0;
+    width: 140px;
 
     border-radius: 8px;
-    font-weight: 700;
-    font-size: 16px;
+    font-weight: 400;
+    font-size: 14px;
     cursor: pointer;
     border: none;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease, font-weight 0.2s ease;
 
     text-align: center;
 }
@@ -57,14 +77,17 @@
 .tabActive {
     background-color: var(--color-primary);
     color: var(--color-white);
+    font-weight: 700;
 }
 
 .tabInactive {
     background-color: var(--color-primary-light);
     color: var(--color-white);
+    font-weight: 400;
 }
 
 .headerTitle {
+    font-family: var(--font-poppins), sans-serif;
     font-size: 32px;
     font-weight: 800;
     margin-bottom: 30px;
@@ -135,7 +158,6 @@
     cursor: pointer;
 }
 
-/* Kanan: Tombol Action */
 .itemRight {
     display: flex;
     align-items: center;
