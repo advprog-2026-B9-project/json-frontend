@@ -42,6 +42,9 @@ export default function RegisterCard() {
             });
 
             if (response.ok) {
+                // Bersihkan semua data sesi lama yang tersisa di browser agar tidak bentrok
+                localStorage.clear();
+
                 setToastMessage('Registrasi berhasil! Silakan login dengan akun baru Anda.');
 
                 setTimeout(() => {
