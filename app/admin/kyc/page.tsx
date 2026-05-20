@@ -1,5 +1,7 @@
 "use client";
 import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 import styles from '../admin.module.css';
 
 interface User {
@@ -12,11 +14,24 @@ interface User {
 }
 
 export default function KycPage() {
+    const router = useRouter();
+    const { isLoaded, isAuthenticated, user} = useAuth();
+
     const [pendingUsers, setPendingUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [adminEmail, setAdminEmail] = useState<string>("");
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+
+    useEffect(() => {
+        if (isLoaded) {
+            if (!isAuthenticated) {
+                router.push('/login');
+            } else if (user?.role !== 'ADMIN') {
+                router.push('/');
+            }
+        }
+    }, [isLoaded, isAuthenticated, user, router]);
 
     useEffect(() => {
         if (typeof window !== "undefined") {

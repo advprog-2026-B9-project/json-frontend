@@ -1,5 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 import styles from '../admin.module.css';
 
 interface User {
@@ -13,12 +15,26 @@ interface User {
 }
 
 export default function ManageUsersPage() {
+    const router = useRouter();
+    const { isLoaded, isAuthenticated, user} = useAuth();
+
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState('');
     const [adminEmail, setAdminEmail] = useState<string>("");
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+
+    // Verifikasi admin
+    useEffect(() => {
+        if (isLoaded) {
+            if (!isAuthenticated) {
+                router.push('/login');
+            } else if (user?.role !== 'ADMIN') {
+                router.push('/');
+            }
+        }
+    }, [isLoaded, isAuthenticated, user, router]);
 
     // 1. Ambil email admin dari localStorage saat komponen dimuat
     useEffect(() => {

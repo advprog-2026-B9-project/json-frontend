@@ -1,8 +1,13 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 import styles from './admin.module.css';
 
 export default function AdminDashboardPage() {
+    const router = useRouter();
+    const { isLoaded, isAuthenticated, user} = useAuth();
+
     const [stats, setStats] = useState({
         pendingKyc: 0,
         totalUsers: 0,
@@ -12,6 +17,16 @@ export default function AdminDashboardPage() {
     const [adminEmail, setAdminEmail] = useState<string>("");
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+
+    useEffect(() => {
+        if (isLoaded) {
+            if (!isAuthenticated) {
+                router.push('/login');
+            } else if (user?.role !== 'ADMIN') {
+                router.push('/');
+            }
+        }
+    }, [isLoaded, isAuthenticated, user, router]);
 
     useEffect(() => {
         if (typeof window !== "undefined") {
