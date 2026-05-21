@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import styles from './profile.module.css';
 
 interface UserData {
+    id?: string;
+    userId?: string;
     email?: string;
     role?: string;
     fullName?: string;
@@ -13,6 +15,10 @@ interface UserData {
     phoneNumber?: string;
     address?: string;
     kycStatus?: string;
+    token?: string;
+    accessToken?: string;
+    jwt?: string;
+    authToken?: string;
 }
 
 export default function ProfilePage() {
@@ -81,7 +87,7 @@ export default function ProfilePage() {
             const storedUser = localStorage.getItem('user');
             if (!storedUser) return;
 
-            const parsedUser = JSON.parse(storedUser);
+            const parsedUser = JSON.parse(storedUser) as UserData;
             if (!parsedUser.email) return;
 
             try {
@@ -91,7 +97,19 @@ export default function ProfilePage() {
                 if (response.ok) {
                     const latestData = await response.json();
 
-                    localStorage.setItem('user', JSON.stringify(latestData));
+                    // Amankan id, userId, dan token bawaan agar tidak tertimpa data kosong
+                    const mergedData = {
+                        ...parsedUser,
+                        ...latestData,
+                        id: parsedUser.id || latestData.id,
+                        userId: parsedUser.userId || latestData.userId,
+                        token: parsedUser.token || latestData.token,
+                        accessToken: parsedUser.accessToken || latestData.accessToken,
+                        jwt: parsedUser.jwt || latestData.jwt,
+                        authToken: parsedUser.authToken || latestData.authToken
+                    };
+
+                    localStorage.setItem('user', JSON.stringify(mergedData));
 
                     setVerificationStatus(latestData.kycStatus || 'UNVERIFIED');
                     setRole(latestData.role || 'TITIPERS');
@@ -138,6 +156,9 @@ export default function ProfilePage() {
         setIsLoading(true);
         setToast({ message: '', isError: false });
 
+        const storedUser = localStorage.getItem('user');
+        const parsedUser = storedUser ? JSON.parse(storedUser) : {};
+
         try {
             const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
             const response = await fetch(`${API_URL}/auth/profile?email=${encodeURIComponent(email)}`, {
@@ -148,7 +169,16 @@ export default function ProfilePage() {
 
             if (response.ok) {
                 const updatedData = await response.json();
-                localStorage.setItem('user', JSON.stringify(updatedData));
+
+                // Amankan id, userId, dan token bawaan saat menyimpan perubahan profil
+                const mergedData = {
+                    ...parsedUser,
+                    ...updatedData,
+                    id: parsedUser.id || updatedData.id,
+                    userId: parsedUser.userId || updatedData.userId
+                };
+
+                localStorage.setItem('user', JSON.stringify(mergedData));
                 showNotification('Profil berhasil diperbarui!', false);
                 setIsEditing(false);
             }
@@ -225,7 +255,16 @@ export default function ProfilePage() {
 
             if (response.ok) {
                 const updatedUser = await response.json();
-                localStorage.setItem('user', JSON.stringify(updatedUser));
+                
+                // Amankan id dan data penting bawaan saat memperbarui data KYC status
+                const mergedData = {
+                    ...loggedInUser,
+                    ...updatedUser,
+                    id: loggedInUser.id || updatedUser.id,
+                    userId: loggedInUser.userId || updatedUser.userId
+                };
+
+                localStorage.setItem('user', JSON.stringify(mergedData));
 
                 setVerificationStatus(updatedUser.kycStatus);
                 showNotification('Pengajuan Jastiper berhasil dikirim!', false);
