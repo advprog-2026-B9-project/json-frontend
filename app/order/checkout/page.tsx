@@ -26,6 +26,7 @@ export default function CheckoutPage() {
     const [loading, setLoading] = useState<boolean>(true);
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [quantity, setQuantity] = useState<number>(1);
+    const [shippingAddress, setShippingAddress] = useState<string>('');  // ← BARU
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '', redirectPath: '' });
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
@@ -36,6 +37,8 @@ export default function CheckoutPage() {
                 const userData = JSON.parse(storedUser);
                 if (userData && userData.id) {
                     setTitiperId(userData.id);
+                    // Pre-fill alamat dari profil user kalau ada
+                    if (userData.address) setShippingAddress(userData.address);
                 } else {
                     setModal({
                         isOpen: true,
@@ -72,7 +75,7 @@ export default function CheckoutPage() {
                         redirectPath: '/products'
                     });
                 }
-            } catch (error) {
+            } catch {
                 setModal({
                     isOpen: true,
                     title: "Koneksi Bermasalah",
@@ -88,30 +91,36 @@ export default function CheckoutPage() {
     }, [productId, API_URL]);
 
     const handleIncreaseQty = () => {
-        if (product && quantity < product.stock) {
-            setQuantity(prev => prev + 1);
-        }
+        if (product && quantity < product.stock) setQuantity(prev => prev + 1);
     };
 
     const handleDecreaseQty = () => {
-        if (quantity > 1) {
-            setQuantity(prev => prev - 1);
-        }
+        if (quantity > 1) setQuantity(prev => prev - 1);
     };
 
     const handleConfirmOrder = async () => {
         if (!product || !titiperId) return;
 
+        // Validasi alamat wajib diisi
+        if (!shippingAddress.trim()) {
+            setModal({
+                isOpen: true,
+                title: "Alamat Diperlukan",
+                message: "Mohon isi alamat pengiriman sebelum melanjutkan.",
+                redirectPath: ''
+            });
+            return;
+        }
+
         setIsProcessing(true);
         try {
-            const calculatedTotalPrice = product.price * quantity;
-
             const orderPayload = {
                 productId: product.id,
                 titiperId: titiperId,
                 quantity: quantity,
-                totalPrice: calculatedTotalPrice,
-                status: "PENDING"
+                totalPrice: product.price * quantity,
+                shippingAddress: shippingAddress.trim(),   // ← BARU
+                productName: product.name,                  // ← BARU
             };
 
             const response = await fetch(`${API_URL}/api/orders/checkout`, {
@@ -123,9 +132,9 @@ export default function CheckoutPage() {
             if (response.ok) {
                 setModal({
                     isOpen: true,
-                    title: "Checkout Berhasil!",
+                    title: "Checkout Berhasil! 🎉",
                     message: "Pesanan Anda sukses dibuat dan saldo telah dipotong.",
-                    redirectPath: '/wallet'
+                    redirectPath: '/order/history'
                 });
             } else {
                 const errorData = await response.text();
@@ -136,7 +145,7 @@ export default function CheckoutPage() {
                     redirectPath: ''
                 });
             }
-        } catch (error) {
+        } catch {
             setModal({
                 isOpen: true,
                 title: "Koneksi Terputus",
@@ -151,9 +160,7 @@ export default function CheckoutPage() {
     const handleCloseModal = () => {
         const path = modal.redirectPath;
         setModal({ ...modal, isOpen: false });
-        if (path) {
-            router.push(path);
-        }
+        if (path) router.push(path);
     };
 
     if (loading) {
@@ -169,7 +176,7 @@ export default function CheckoutPage() {
 
     return (
         <div className={styles.pageContainer}>
-            {/* Pop up Modal */}
+            {/* Modal */}
             {modal.isOpen && (
                 <div className={styles.modalBackdrop}>
                     <div className={styles.modalCard}>
@@ -203,22 +210,17 @@ export default function CheckoutPage() {
                                 <strong>Rp {product.price.toLocaleString('id-ID')}</strong>
                             </div>
                             <div className={styles.metaItem}>
-                                Sisa Stok Tersedia
+                                Sisa Stok
                                 <strong style={{ color: product.stock > 0 ? 'inherit' : '#FF4757' }}>
                                     {product.stock} pcs
                                 </strong>
                             </div>
                         </div>
 
-                        {/* Bagian Atur Kuantitas */}
+                        {/* Quantity */}
                         <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            margin: '24px 0',
-                            padding: '16px',
-                            backgroundColor: '#f8f9fa',
-                            borderRadius: '12px'
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            margin: '24px 0', padding: '16px', backgroundColor: '#f8f9fa', borderRadius: '12px'
                         }}>
                             <span style={{ fontWeight: '600', fontSize: '16px' }}>Jumlah Pembelian</span>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -230,9 +232,7 @@ export default function CheckoutPage() {
                                         border: '1px solid #ddd', backgroundColor: 'white',
                                         fontSize: '20px', cursor: quantity <= 1 ? 'not-allowed' : 'pointer'
                                     }}
-                                >
-                                    -
-                                </button>
+                                >−</button>
                                 <span style={{ fontSize: '18px', fontWeight: 'bold', width: '30px', textAlign: 'center' }}>
                                     {quantity}
                                 </span>
@@ -244,20 +244,46 @@ export default function CheckoutPage() {
                                         border: '1px solid #ddd', backgroundColor: 'white',
                                         fontSize: '20px', cursor: quantity >= product.stock ? 'not-allowed' : 'pointer'
                                     }}
-                                >
-                                    +
-                                </button>
+                                >+</button>
                             </div>
                         </div>
 
-                        {/* Total Biaya */}
+                        {/* ── ALAMAT PENGIRIMAN ── */}
+                        <div style={{ marginBottom: '24px' }}>
+                            <label style={{
+                                display: 'block', fontWeight: '600', fontSize: '15px',
+                                marginBottom: '8px', color: '#1f2937'
+                            }}>
+                                Alamat Pengiriman <span style={{ color: '#ef4444' }}>*</span>
+                            </label>
+                            <textarea
+                                value={shippingAddress}
+                                onChange={(e) => setShippingAddress(e.target.value)}
+                                placeholder="Contoh: Jl. Margonda Raya No. 100, Depok, Jawa Barat"
+                                disabled={isProcessing}
+                                rows={3}
+                                style={{
+                                    width: '100%',
+                                    padding: '12px 14px',
+                                    borderRadius: '10px',
+                                    border: '1.5px solid #e5e7eb',
+                                    fontSize: '14px',
+                                    fontFamily: 'inherit',
+                                    resize: 'vertical',
+                                    outline: 'none',
+                                    transition: 'border-color 0.2s',
+                                    boxSizing: 'border-box',
+                                    color: '#374151',
+                                }}
+                                onFocus={(e) => e.target.style.borderColor = '#8F39DF'}
+                                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                            />
+                        </div>
+
+                        {/* Total */}
                         <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            marginBottom: '24px',
-                            borderTop: '2px dashed #eee',
-                            paddingTop: '24px'
+                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                            marginBottom: '24px', borderTop: '2px dashed #eee', paddingTop: '24px'
                         }}>
                             <span style={{ fontSize: '18px', color: '#666' }}>Total Pembayaran</span>
                             <div className={styles.detailPrice} style={{ marginBottom: 0 }}>
