@@ -35,17 +35,25 @@ export default function KycPage() {
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            const storedEmail = localStorage.getItem("userEmail") || "";
-            setAdminEmail(storedEmail);
+            const storedUser = localStorage.getItem("user");
+
+            if (storedUser) {
+                const parsedUser = JSON.parse(storedUser);
+
+                setAdminEmail(parsedUser.email || "");
+            }
         }
     }, []);
 
     const fetchUsers = useCallback(async () => {
-        if (!adminEmail) return;
+        if (!adminEmail) {
+            setLoading(false);
+            return;
+        }
 
         try {
             setLoading(true);
-            const response = await fetch(`${API_URL}/auth/admin/kyc/pending?requesterEmail=${adminEmail}`);
+            const response = await fetch(`${API_URL}/api/v1/auth/admin/kyc/pending?requesterEmail=${adminEmail}`);
             if (response.ok) {
                 const data: User[] = await response.json();
                 setPendingUsers(data);
@@ -57,7 +65,7 @@ export default function KycPage() {
         } finally {
             setLoading(false);
         }
-    }, [adminEmail, API_URL]);
+    }, [adminEmail]);
 
     useEffect(() => {
         fetchUsers();
@@ -69,7 +77,7 @@ export default function KycPage() {
 
         try {
             // Post API juga MENGIRIMKAN requesterEmail
-            const response = await fetch(`${API_URL}/auth/admin/kyc/review?requesterEmail=${adminEmail}`, {
+            const response = await fetch(`${API_URL}/api/v1/auth/admin/kyc/review?requesterEmail=${adminEmail}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, approved: isApproved }),

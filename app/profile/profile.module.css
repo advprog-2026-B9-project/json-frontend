@@ -43,6 +43,7 @@
     width: 150px;
     height: 150px;
     z-index: 10;
+    pointer-events: none;
 }
 
 .avatarContainer {
@@ -83,6 +84,7 @@
     z-index: 11;
     padding: 0;
     margin: 0;
+    pointer-events: auto;
 }
 
 .editAvatarIconContainer:hover {

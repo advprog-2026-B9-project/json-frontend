@@ -36,21 +36,24 @@ export default function ManageUsersPage() {
         }
     }, [isLoaded, isAuthenticated, user, router]);
 
-    // 1. Ambil email admin dari localStorage saat komponen dimuat
     useEffect(() => {
         if (typeof window !== "undefined") {
-            const storedEmail = localStorage.getItem("userEmail") || "";
-            setAdminEmail(storedEmail);
+            const storedUser = localStorage.getItem("user");
+
+            if (storedUser) {
+                const parsedUser = JSON.parse(storedUser);
+
+                setAdminEmail(parsedUser.email || "");
+            }
         }
     }, []);
 
-    // 2. Fungsi ambil data user
     const fetchUsers = async () => {
         try {
             setLoading(true);
             const url = statusFilter
-                ? `${API_URL}/auth/list?status=${statusFilter}`
-                : `${API_URL}/auth/list`;
+                ? `${API_URL}/api/v1/auth/list?status=${statusFilter}`
+                : `${API_URL}/api/v1/auth/list`;
 
             const response = await fetch(url);
             if (response.ok) {
@@ -64,17 +67,15 @@ export default function ManageUsersPage() {
         }
     };
 
-    // 3. Panggil fungsi saat pertama kali halaman dibuka ATAU saat filter diganti
     useEffect(() => {
         fetchUsers();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [statusFilter]);
 
     const handleBanUser = async (email: string) => {
         if (!window.confirm(`Apakah Anda yakin ingin mem-banned user ${email}?`)) return;
 
         try {
-            const response = await fetch(`${API_URL}/auth/admin/ban?requesterEmail=${adminEmail}&email=${email}`, {
+            const response = await fetch(`${API_URL}/api/v1/auth/admin/ban?requesterEmail=${adminEmail}&email=${email}`, {
                 method: 'POST',
             });
 
@@ -95,7 +96,7 @@ export default function ManageUsersPage() {
         if (!window.confirm(`Apakah Anda yakin ingin menurunkan ${email} menjadi TITIPERS?`)) return;
 
         try {
-            const response = await fetch(`${API_URL}/auth/admin/demote?requesterEmail=${adminEmail}&email=${email}`, {
+            const response = await fetch(`${API_URL}/api/v1/auth/admin/demote?requesterEmail=${adminEmail}&email=${email}`, {
                 method: 'POST',
             });
 

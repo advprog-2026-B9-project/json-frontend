@@ -210,8 +210,8 @@ export default function ProfilePage() {
     };
 
     const handleOpenKycModal = () => {
-        setKtpFullName(fullName);
         setIsKycModalOpen(true);
+        setKtpFullName(fullName);
     };
 
     const handleCloseKycModal = () => {
@@ -410,6 +410,88 @@ export default function ProfilePage() {
                     </Link>
                 </div>
             </div>
+
+            {isKycModalOpen && (
+                <div
+                    className={styles.backdrop}
+                    onClick={handleCloseKycModal}
+                >
+                    <div
+                        className={styles.modal}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h3 className={styles.modalTitle}>
+                            Upgrade to Jastiper
+                        </h3>
+
+                        <div className={styles.inputGroup}>
+                            <label className={styles.label}>
+                                Nama Lengkap Sesuai KTP
+                            </label>
+
+                            <input
+                                type="text"
+                                className={styles.inputField}
+                                value={ktpFullName}
+                                onChange={(e) => setKtpFullName(e.target.value)}
+                                placeholder="Masukkan nama lengkap"
+                            />
+                        </div>
+
+                        <div
+                            className={styles.inputGroup}
+                            style={{ marginTop: '16px' }}
+                        >
+                            <label className={styles.label}>
+                                NIK KTP
+                            </label>
+
+                            <input
+                                type="text"
+                                className={styles.inputField}
+                                value={ktpNIK}
+                                onChange={handleNikChange}
+                                placeholder="16 digit NIK"
+                            />
+                        </div>
+
+                        <div
+                            className={styles.inputGroup}
+                            style={{ marginTop: '16px' }}
+                        >
+                            <label className={styles.label}>
+                                URL Foto KTP
+                            </label>
+
+                            <input
+                                type="url"
+                                className={styles.inputField}
+                                value={ktpImageUrl}
+                                onChange={(e) => setKtpImageUrl(e.target.value)}
+                                placeholder="https://example.com/ktp.jpg"
+                            />
+                        </div>
+
+                        <div className={styles.modalAction}>
+                            <button
+                                type="button"
+                                className={styles.cancelButton}
+                                onClick={handleCloseKycModal}
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="button"
+                                className={styles.saveButton}
+                                onClick={handleKycSubmit}
+                            >
+                                Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {isPhotoModalOpen && (
                 <div

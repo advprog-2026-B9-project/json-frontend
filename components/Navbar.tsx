@@ -17,6 +17,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<UserSession | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   
   const router = useRouter();
   const pathname = usePathname();
@@ -40,13 +41,16 @@ const Navbar = () => {
   }, [pathname]);
 
   const handleLogout = () => {
+    setIsLoggingOut(true);
     localStorage.removeItem('user');
     setUser(null);
     setIsOpen(false);
     router.push('/login');
   };
 
-  if (!isMounted) return <nav className={styles.navbar}></nav>;
+  if (!isMounted || isLoggingOut) {
+    return null;
+  }
 
   const userRole = user?.role?.toUpperCase();
   const isAdmin = userRole === 'ADMIN';
@@ -146,7 +150,9 @@ const Navbar = () => {
                       src={
                         user.photoUrl
                           ? user.photoUrl
-                            : `https://api.dicebear.com/7.x/initials/svg?seed=${user.fullName || 'User'}&backgroundColor=000000`
+                            : `https://api.dicebear.com/7.x/initials/svg?seed=${
+                              user.fullName || user.username || user.role || 'User'}  
+                            }&backgroundColor=8F39DF`
                       }
                       alt="Avatar"
                       className={styles.avatarImg}
