@@ -1,81 +1,89 @@
 "use client";
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import styles from '../jastiper.module.css';
 import { useAuth } from '@/hooks/useAuth';
 import { useModal } from '@/hooks/useModal';
 import Modal from '@/components/Modal';
+import styles from '../../admin.module.css'; 
+import sharedStyles from '@/components/shared.module.css'; 
 
-function ManageProductForm() {
+function AdminEditProductForm() {
     const router = useRouter();
-    const { isLoaded, isAuthenticated, user } = useAuth();
-    const { modal, openModal, closeModal } = useModal();
     
     const searchParams = useSearchParams();
     const productId = searchParams.get('id');
-    const isEditMode = !!productId;
-    
+
+    const { isLoaded, isAuthenticated, user} = useAuth();
+    const { modal, openModal, closeModal } = useModal();
+
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-    
+
     const [formData, setFormData] = useState({
         name: '',
         description: '',
         price: '',
         stock: '',
         originCountry: '',
-        arrivalDate: ''
+        arrivalDate: '',
+        ownerUsername: ''
     });
-    
-    const [fetching, setFetching] = useState<boolean>(false);
+    const [fetching, setFetching] = useState<boolean>(true);
 
     useEffect(() => {
         if (isLoaded) {
             if (!isAuthenticated) {
                 router.push('/login');
-            } else if (user?.role !== 'JASTIPER') {
+            } else if (user?.role !== 'ADMIN') {
                 router.push('/');
             }
         }
     }, [isLoaded, isAuthenticated, user, router]);
 
     useEffect(() => {
-        if (isEditMode) {
-            const fetchProductDetail = async () => {
-                try {
-                    setFetching(true);
-                    const response = await fetch(`${API_URL}/api/v1/products/${productId}`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        setFormData({
-                            name: data.name,
-                            description: data.description,
-                            price: data.price.toString(),
-                            stock: data.stock.toString(),
-                            originCountry: data.originCountry || '',
-                            arrivalDate: data.arrivalDate || ''
-                        });
-                    } else {
-                        openModal({
-                            title: "Gagal Memuat",
-                            message: "Gagal mengambil detail produk. Produk mungkin telah dihapus.",
-                            type: 'info',
-                            redirectPath: '/jastiper/products'
-                        });
-                    }
-                } catch (error) {
-                    openModal({
-                        title: "Koneksi Bermasalah",
-                        message: "Tidak dapat terhubung ke server.",
-                        type: 'info',
-                        redirectPath: '/jastiper/products'
+        if (!productId) {
+            router.push('/admin/products');
+            return;
+        }
+
+        const fetchProductDetail = async () => {
+            try {
+                setFetching(true);
+                const response = await fetch(`${API_URL}/api/v1/products/${productId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setFormData({
+                        name: data.name,
+                        description: data.description,
+                        price: data.price.toString(),
+                        stock: data.stock.toString(),
+                        originCountry: data.originCountry || '',
+                        arrivalDate: data.arrivalDate || '',
+                        ownerUsername: data.ownerUsername || ''
                     });
-                } finally {
-                    setFetching(false);
+                } else {
+                    openModal({
+                        title: "Gagal Memuat",
+                        message: "Produk tidak ditemukan atau telah dihapus.",
+                        type: 'info',
+                        redirectPath: '/admin/products'
+                    });
                 }
-            };
+            } catch {
+                openModal({
+                    title: "Koneksi Terputus",
+                    message: "Gagal terhubung ke server untuk mengambil data.",
+                    type: 'info',
+                    redirectPath: '/admin/products'
+                });
+            } finally {
+                setFetching(false);
+            }
+        };
+
+        if (isLoaded && isAuthenticated) {
             fetchProductDetail();
         }
-    }, [productId, isEditMode, API_URL]);
+    }, [productId, isLoaded, isAuthenticated, API_URL]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -93,44 +101,12 @@ function ManageProductForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const storedUser = localStorage.getItem('user');
-        let activeUserId = '';
-
-        try {
-            if (!storedUser) throw new Error("Tidak ada data user");
-            
-            const userData = JSON.parse(storedUser);
-            
-            activeUserId = userData?.id || userData?.userId; 
-
-            if (!activeUserId) {
-                throw new Error("ID pengguna tidak ditemukan di dalam sesi");
-            }
-        } catch (error) {
-            openModal({
-                title: "Sesi Tidak Valid",
-                message: "Data sesi Anda rusak atau ID tidak ditemukan. Silakan login kembali.",
-                type: 'info',
-                redirectPath: '/login'
-            });
-            return;
-        }
-
         if (parseInt(formData.stock) < 0) {
-            openModal({
-                title: "Validasi Gagal",
-                message: "Stok minimal bernilai 0",
-                type: 'info'
-            });
+            openModal({ title: "Validasi Gagal", message: "Stok minimal bernilai 0", type: 'info' });
             return;
         }
-        
         if (parseFloat(formData.price) < 0) {
-            openModal({
-                title: "Validasi Gagal",
-                message: "Harga tidak boleh negatif",
-                type: 'info'
-            });
+            openModal({ title: "Validasi Gagal", message: "Harga tidak boleh negatif", type: 'info' });
             return;
         }
 
@@ -140,76 +116,63 @@ function ManageProductForm() {
             stock: parseInt(formData.stock)
         };
 
-        const url = isEditMode ? `${API_URL}/api/v1/products/${productId}` : `${API_URL}/api/v1/products`;
-        const method = isEditMode ? 'PUT' : 'POST';
-
         try {
-            const response = await fetch(url, {
-                method: method,
+            const response = await fetch(`${API_URL}/api/v1/products/admin/${productId}`, {
+                method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-User-Id': String(activeUserId)
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(payload)
             });
 
             if (response.ok) {
                 openModal({
-                    title: "Berhasil!",
-                    message: isEditMode ? "Produk berhasil diperbarui!" : "Produk berhasil ditambahkan ke katalog!",
+                    title: "Berhasil",
+                    message: "Data produk berhasil diperbarui",
                     type: 'info',
-                    redirectPath: '/jastiper/products'
+                    redirectPath: '/admin/products'
                 });
             } else {
                 const errorText = await response.text();
-                openModal({
-                    title: "Gagal Menyimpan",
-                    message: `Gagal menyimpan data: ${errorText}`,
-                    type: 'info'
-                });
+                openModal({ title: "Gagal Menyimpan", message: `Server menolak perubahan: ${errorText}`, type: 'info' });
             }
-        } catch (error) {
-            openModal({
-                title: "Kesalahan Sistem",
-                message: "Terjadi kesalahan koneksi sistem saat menyimpan data.",
-                type: 'info'
-            });
+        } catch {
+            openModal({ title: "Kesalahan Sistem", message: "Gagal terhubung ke server saat memperbarui data.", type: 'info' });
         }
     };
 
+    if (!isLoaded || !isAuthenticated) return null;
+
     if (fetching) {
         return (
-            <div className={styles.pageContainer}>
-                <div className={styles.banner}></div>
-                <div className={styles.card}>
-                    <p className={styles.centerMessage}>Mengambil data produk terdaftar...</p>
-                </div>
+            <div className={styles.pageContainer} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <p style={{ color: 'var(--color-gray-text)' }}>Mengambil informasi data produk dari database...</p>
             </div>
         );
     }
 
     return (
-        <div className={styles.pageContainer}>
+        <div className={styles.pageContainer} style={{ paddingTop: '40px' }}>
             <Modal 
                 isOpen={modal.isOpen} 
                 title={modal.title} 
                 message={modal.message} 
-                type={modal.type || 'info'} 
+                type={modal.type} 
                 onClose={handleCloseModal} 
             />
 
-            <div className={styles.banner}></div>
-            <div className={styles.card}>
-                <h1 className={styles.headerTitle} style={{ marginBottom: '30px' }}>
-                    {isEditMode ? 'Edit Informasi Produk' : 'Buat Katalog Produk Jastip'}
-                </h1>
+            <div className={styles.card} style={{ margin: '0 auto', maxWidth: '900px' }}>
+                <h1 className={styles.headerTitle} style={{ marginBottom: '10px' }}>Edit Produk</h1>
+                <p style={{ color: '#6B7280', marginBottom: '30px', fontSize: '14px' }}>
+                    Anda sedang mengubah paksa properti produk milik jastiper <b>@{formData.ownerUsername}</b>.
+                </p>
 
                 <form onSubmit={handleSubmit} className={styles.formGrid}>
                     <div className={`${styles.inputGroup} ${styles.fullWidth}`}>
                         <label className={styles.label}>Nama Produk *</label>
                         <input 
                             type="text" name="name" required maxLength={255}
-                            className={styles.inputField} placeholder="Contoh: Sushi Roll Premium Halal Tokyo"
+                            className={styles.inputField}
                             value={formData.name} onChange={handleInputChange}
                         />
                     </div>
@@ -219,7 +182,6 @@ function ManageProductForm() {
                         <textarea 
                             name="description" required rows={4}
                             className={styles.inputField} style={{ resize: 'vertical' }}
-                            placeholder="Tuliskan spesifikasi detail barang titipan..."
                             value={formData.description} onChange={handleInputChange}
                         />
                     </div>
@@ -228,7 +190,7 @@ function ManageProductForm() {
                         <label className={styles.label}>Harga Produk (Rp) *</label>
                         <input 
                             type="number" name="price" required min="0" step="0.01"
-                            className={styles.inputField} placeholder="0"
+                            className={styles.inputField}
                             value={formData.price} onChange={handleInputChange}
                         />
                     </div>
@@ -237,7 +199,7 @@ function ManageProductForm() {
                         <label className={styles.label}>Stok / Kuota Bagasi *</label>
                         <input 
                             type="number" name="stock" required min="0"
-                            className={styles.inputField} placeholder="0"
+                            className={styles.inputField}
                             value={formData.stock} onChange={handleInputChange}
                         />
                     </div>
@@ -246,8 +208,7 @@ function ManageProductForm() {
                         <label className={styles.label}>Negara / Lokasi Asal Pembelian *</label>
                         <input 
                             type="text" name="originCountry" required
-                            disabled={isEditMode}
-                            className={styles.inputField} placeholder="Contoh: Jepang"
+                            className={styles.inputField}
                             value={formData.originCountry} onChange={handleInputChange}
                         />
                     </div>
@@ -256,7 +217,6 @@ function ManageProductForm() {
                         <label className={styles.label}>Tanggal Kembali / Tiba *</label>
                         <input 
                             type="date" name="arrivalDate" required
-                            disabled={isEditMode}
                             className={styles.inputField}
                             value={formData.arrivalDate} onChange={handleInputChange}
                         />
@@ -264,13 +224,13 @@ function ManageProductForm() {
 
                     <div className={`${styles.formActions} ${styles.fullWidth}`}>
                         <button 
-                            type="button" className={styles.secondaryBtn}
-                            onClick={() => router.push('/jastiper/products')}
+                            type="button" className={sharedStyles.secondaryBtn}
+                            onClick={() => router.push('/admin/products')}
                         >
                             Batal
                         </button>
-                        <button type="submit" className={styles.primaryBtn}>
-                            {isEditMode ? 'Simpan Perubahan' : 'Rilis ke Katalog'}
+                        <button type="submit" className={sharedStyles.primaryBtn}>
+                            Simpan Perubahan
                         </button>
                     </div>
                 </form>
@@ -279,10 +239,10 @@ function ManageProductForm() {
     );
 }
 
-export default function ManageProductPage() {
+export default function AdminEditProductPage() {
     return (
-        <Suspense fallback={<div className={styles.pageContainer}><p className={styles.centerMessage}>Memuat formulir...</p></div>}>
-            <ManageProductForm />
+        <Suspense fallback={<div style={{ textAlign: 'center', padding: '40px' }}><p>Memuat formulir...</p></div>}>
+            <AdminEditProductForm />
         </Suspense>
     );
 }
