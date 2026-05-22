@@ -229,50 +229,60 @@ export default function WalletPage() {
     const [inputAmount, setInputAmount] = useState("");
 
     const fetchWalletAndTransactions = async (currentWalletId: string) => {
-        const walletResponse = await fetch(`${API_URL}/wallets/${currentWalletId}`, buildAuthOptions());
-        await assertOk(walletResponse, `GET ${API_URL}/wallets/${currentWalletId}`, "Gagal memperbarui data wallet.");
+        const walletResponse = await fetch(`${API_URL}/api/v1/wallets/${currentWalletId}`, buildAuthOptions());
+        await assertOk(walletResponse, `GET ${API_URL}/api/v1/wallets/${currentWalletId}`, "Gagal memperbarui data wallet.");
         const walletData = await walletResponse.json() as WalletApiResponse;
         setBalance(toNumber(walletData.balance));
 
-        const transactionResponse = await fetch(`${API_URL}/transactions/wallets/${currentWalletId}`, buildAuthOptions());
-        await assertOk(transactionResponse, `GET ${API_URL}/transactions/wallets/${currentWalletId}`, "Gagal memperbarui data transaksi.");
+        const transactionResponse = await fetch(`${API_URL}/api/v1/transactions/wallets/${currentWalletId}`, buildAuthOptions());
+        await assertOk(transactionResponse, `GET ${API_URL}/api/v1/transactions/wallets/${currentWalletId}`, "Gagal memperbarui data transaksi.");
         const transactionData = await transactionResponse.json() as TransactionApiResponse[];
         setTransactions(sortByNewest(transactionData).map(mapTransactionToUi));
     };
 
+    const decodeUserIdFromToken = (token?: string): string | null => {
+        if (!token) return null;
+        try {
+            const payload = JSON.parse(atob(token.split(".")[1]));
+            return payload.id || payload.sub || null;
+        } catch {
+            return null;
+        }
+    };
+
     const loadWalletDataByUserId = async (userId: string) => {
-        const walletResponse = await fetch(`${API_URL}/wallets/users/${userId}`, buildAuthOptions());
+        const walletResponse = await fetch(`${API_URL}/api/v1/wallets/users/${userId}`, buildAuthOptions());
         let effectiveWalletResponse = walletResponse;
 
         if (walletResponse.status === 404) {
-            const createWalletResponse = await fetch(`${API_URL}/wallets/users/${userId}`, {
+            const createWalletResponse = await fetch(`${API_URL}/api/v1/wallets/users/${userId}`, {
                 method: "POST",
                 ...buildAuthOptions(),
             });
-            await assertOk(createWalletResponse, `POST ${API_URL}/wallets/users/${userId}`, "Gagal membuat wallet baru.");
+            await assertOk(createWalletResponse, `POST ${API_URL}/api/v1/wallets/users/${userId}`, "Gagal membuat wallet baru.");
             effectiveWalletResponse = createWalletResponse;
         }
 
-        await assertOk(effectiveWalletResponse, `GET ${API_URL}/wallets/users/${userId}`, "Gagal mengambil data wallet.");
+        await assertOk(effectiveWalletResponse, `GET ${API_URL}/api/v1/wallets/users/${userId}`, "Gagal mengambil data wallet.");
         const walletData = await effectiveWalletResponse.json() as WalletApiResponse;
         setWalletId(walletData.id);
         await fetchWalletAndTransactions(walletData.id);
     };
 
     const settleTransaction = async (transactionId: string) => {
-        const settleResponse = await fetch(`${API_URL}/transactions/${transactionId}/success`, {
+        const settleResponse = await fetch(`${API_URL}/api/v1/transactions/${transactionId}/success`, {
             method: "POST",
             ...buildAuthOptions(),
         });
         if (!settleResponse.ok) {
             try {
-                await fetch(`${API_URL}/transactions/${transactionId}/failed`, {
+                await fetch(`${API_URL}/api/v1/transactions/${transactionId}/failed`, {
                     method: "POST", ...buildAuthOptions()
                 });
             } catch {
                 // Best effort
             }
-            await assertOk(settleResponse, `POST ${API_URL}/transactions/${transactionId}/success`, "Transaksi gagal diselesaikan.");
+            await assertOk(settleResponse, `POST ${API_URL}/api/v1/transactions/${transactionId}/success`, "Transaksi gagal diselesaikan.");
         }
     };
 
@@ -289,7 +299,7 @@ export default function WalletPage() {
 
             try {
                 const parsedUser = JSON.parse(storedUser) as UserSession;
-                const loggedInUserId = parsedUser.id || parsedUser.userId;
+                const loggedInUserId = parsedUser.id || parsedUser.userId || decodeUserIdFromToken(parsedUser.token);
                 if (!loggedInUserId) throw new Error("ID user tidak ditemukan.");
 
                 if (!isMounted) return;
@@ -319,10 +329,10 @@ export default function WalletPage() {
         setIsSubmitting(true);
 
         try {
-            const createResponse = await fetch(`${API_URL}/transactions/${endpoint}?walletId=${walletId}&amount=${amount}`, {
+            const createResponse = await fetch(`${API_URL}/api/v1/transactions/${endpoint}?walletId=${walletId}&amount=${amount}`, {
                 method: "POST", ...buildAuthOptions(),
             });
-            await assertOk(createResponse, `POST ${API_URL}/transactions/${endpoint}`, `${action} gagal diproses.`);
+            await assertOk(createResponse, `POST ${API_URL}/api/v1/transactions/${endpoint}`, `${action} gagal diproses.`);
 
             const createdTransaction = await createResponse.json() as TransactionApiResponse;
             await settleTransaction(createdTransaction.id);
@@ -388,7 +398,7 @@ export default function WalletPage() {
                                 </button>
                             )}
                             
-                            {userRole === 'JASTIPERS' && (
+                            {userRole === 'JASTIPER' && (
                                 <button type="button" className={styles.withdrawButton} onClick={() => { setInputAmount(""); setActiveAction("withdraw"); }} disabled={isSubmitting || !walletId}>
                                     <WithdrawIcon />
                                     Withdraw
