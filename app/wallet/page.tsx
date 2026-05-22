@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Poppins } from "next/font/google";
 import { useRouter } from "next/navigation";
 import styles from "./wallet.module.css";
@@ -10,7 +10,18 @@ const poppins = Poppins({
     weight: ["400", "500", "600", "700"],
 });
 
-type WalletSummary = { balance: number };
+type UserSession = {
+    id?: string;
+    userId?: string;
+    fullName?: string;
+    username?: string;
+    role?: string;
+    token?: string;
+    accessToken?: string;
+    jwt?: string;
+    authToken?: string;
+};
+
 type TransactionStatus = "success" | "pending" | "failed";
 type TransactionType = "topup" | "payment" | "withdraw" | "refund";
 type WalletActionType = "topup" | "withdraw";
@@ -22,18 +33,6 @@ type TransactionItem = {
     amount: number;
     type: TransactionType;
     status: TransactionStatus;
-};
-
-type UserSession = {
-    id?: string;
-    userId?: string;
-    fullName?: string;
-    username?: string;
-    role?: string; // Menambahkan tipe role untuk conditional rendering
-    token?: string;
-    accessToken?: string;
-    jwt?: string;
-    authToken?: string;
 };
 
 type WalletApiResponse = {
@@ -65,7 +64,7 @@ const buildAuthOptions = (): RequestInit => {
             }
         }
     } catch {
-        // Abaikan data tidak valid
+        // Abaikan jika tidak valid
     }
     return { headers, credentials: "include" };
 };
@@ -207,14 +206,12 @@ const WalletIcon = () => (
 
 const TopUpIcon = () => (
     <svg viewBox="0 0 24 24" className={styles.actionIcon} aria-hidden="true">
-        {/* Panah ke atas */}
         <path d="M12 20a1 1 0 0 1-1-1v-8.59l-2.3 2.3a1 1 0 1 1-1.4-1.42l4-4a1 1 0 0 1 1.4 0l4 4a1 1 0 1 1-1.4 1.42L13 10.4V19a1 1 0 0 1-1 1Z" fill="currentColor" />
     </svg>
 );
 
 const WithdrawIcon = () => (
     <svg viewBox="0 0 24 24" className={styles.actionIcon} aria-hidden="true">
-        {/* Panah ke bawah */}
         <path d="M12 4a1 1 0 0 1 1 1v8.59l2.3-2.3a1 1 0 1 1 1.4 1.42l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 1.4-1.42L11 13.6V5a1 1 0 0 1 1-1Z" fill="currentColor" />
     </svg>
 );
@@ -273,7 +270,7 @@ export default function WalletPage() {
                     method: "POST", ...buildAuthOptions()
                 });
             } catch {
-                // Best effort only
+                // Best effort
             }
             await assertOk(settleResponse, `POST ${API_URL}/transactions/${transactionId}/success`, "Transaksi gagal diselesaikan.");
         }
@@ -310,7 +307,6 @@ export default function WalletPage() {
         return () => { isMounted = false; };
     }, [router]);
 
-    const profileName = useMemo(() => session?.fullName || session?.username || "Pengguna", [session?.fullName, session?.username]);
     const userRole = session?.role?.toUpperCase();
 
     const processWalletAction = async (action: WalletActionType, amount: number) => {
@@ -374,40 +370,33 @@ export default function WalletPage() {
         <main className={`${styles.page} ${poppins.className}`}>
             <section className={styles.heroArea}>
                 <div className={styles.heroContent}>
-                    <div className={styles.brand}>JSON</div>
-                    <div className={styles.profileArea}>
-                        <div>
-                            <div className={styles.profileLabel}>Nama</div>
-                            <div className={styles.profileName}>{profileName}</div>
-                        </div>
-                        <div className={styles.profileAvatar} aria-hidden="true" />
-                    </div>
-                </div>
-            </section>
-
-            <section className={styles.walletCard}>
-                <div>
-                    <div className={styles.walletMeta}>
-                        <WalletIcon />
-                        <span>Total Saldo Wallet</span>
-                    </div>
-                    <h1 className={styles.walletAmount} aria-live="polite">{formatRupiah(balance)}</h1>
-                </div>
-
-                <div className={styles.actionGroup}>
-                    {userRole === 'TITIPERS' && (
-                        <button type="button" className={styles.topUpButton} onClick={() => { setInputAmount(""); setActiveAction("topup"); }} disabled={isSubmitting || !walletId}>
-                            <TopUpIcon />
-                            Top Up
-                        </button>
-                    )}
                     
-                    {userRole === 'JASTIPERS' && (
-                        <button type="button" className={styles.withdrawButton} onClick={() => { setInputAmount(""); setActiveAction("withdraw"); }} disabled={isSubmitting || !walletId}>
-                            <WithdrawIcon />
-                            Withdraw
-                        </button>
-                    )}
+                    <section className={styles.walletCard}>
+                        <div>
+                            <div className={styles.walletMeta}>
+                                <WalletIcon />
+                                <span>Total Saldo Wallet</span>
+                            </div>
+                            <h1 className={styles.walletAmount} aria-live="polite">{formatRupiah(balance)}</h1>
+                        </div>
+
+                        <div className={styles.actionGroup}>
+                            {userRole === 'TITIPERS' && (
+                                <button type="button" className={styles.topUpButton} onClick={() => { setInputAmount(""); setActiveAction("topup"); }} disabled={isSubmitting || !walletId}>
+                                    <TopUpIcon />
+                                    Top Up
+                                </button>
+                            )}
+                            
+                            {userRole === 'JASTIPERS' && (
+                                <button type="button" className={styles.withdrawButton} onClick={() => { setInputAmount(""); setActiveAction("withdraw"); }} disabled={isSubmitting || !walletId}>
+                                    <WithdrawIcon />
+                                    Withdraw
+                                </button>
+                            )}
+                        </div>
+                    </section>
+
                 </div>
             </section>
 
