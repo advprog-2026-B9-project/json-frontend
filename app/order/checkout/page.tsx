@@ -7,7 +7,8 @@ import styles from '../../products/titipers.module.css';
 interface Product {
     id: string; name: string; description: string; price: number;
     stock: number; originCountry: string; arrivalDate: string;
-    ownerUsername: string; jastiperId: string;
+    ownerId: string; jastiperId: string;
+    ownerUsername?: string;
 }
 
 function CheckoutContent() {
@@ -68,7 +69,7 @@ function CheckoutContent() {
                     totalPrice: product.price * quantity,
                     shippingAddress: shippingAddress.trim(),
                     productName: product.name,
-                    jastiperId: product.jastiperId,
+                    jastiperId: product.ownerId,
                     jastiperUsername: product.ownerUsername
                 })
             });
@@ -113,7 +114,7 @@ function CheckoutContent() {
                     <div className={styles.detailInfo} style={{ width: '100%' }}>
                         <h1 className={styles.detailTitle}>{product.name}</h1>
                         <div className={styles.specBox}>
-                            <div className={styles.metaItem}>Jastiper<strong>@{product.ownerUsername}</strong></div>
+                            <div className={styles.metaItem}>Jastiper<strong>@{product.ownerUsername || 'jastiper'}</strong></div>
                             <div className={styles.metaItem}>Harga Satuan<strong>Rp {product.price.toLocaleString('id-ID')}</strong></div>
                             <div className={styles.metaItem}>Sisa Stok<strong style={{ color: product.stock > 0 ? 'inherit' : '#FF4757' }}>{product.stock} pcs</strong></div>
                         </div>
