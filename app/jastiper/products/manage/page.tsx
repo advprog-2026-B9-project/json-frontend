@@ -109,11 +109,11 @@ function ManageProductForm() {
             return;
         }
 
-        let activeUsername = '';
+        let activeUserId = '';
         try {
             const userData = JSON.parse(storedUser);
-            activeUsername = userData?.username;
-            if (!activeUsername) {
+            activeUserId = userData?.userId;
+            if (!activeUserId) {
                 throw new Error("Username tidak ditemukan");
             }
         } catch (error) {
@@ -150,7 +150,7 @@ function ManageProductForm() {
             ...formData,
             price: parseFloat(formData.price),
             stock: parseInt(formData.stock),
-            ownerUsername: activeUsername
+            ownerUsername: activeUserId
         };
 
         const url = isEditMode ? `${API_URL}/api/v1/products/${productId}` : `${API_URL}/api/v1/products`;
@@ -161,7 +161,7 @@ function ManageProductForm() {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-User-Name': activeUsername
+                    'X-User-Id': activeUserId
                 },
                 body: JSON.stringify(payload)
             });

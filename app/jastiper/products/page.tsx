@@ -20,7 +20,7 @@ interface Product {
 
 export default function JastiperDashboard() {
     const router = useRouter();
-    const { username, isLoaded, isAuthenticated, user } = useAuth();
+    const { userId, isLoaded, isAuthenticated, user } = useAuth();
     const { modal, openModal, closeModal } = useModal();
     
     const [products, setProducts] = useState<Product[]>([]);
@@ -40,11 +40,11 @@ export default function JastiperDashboard() {
     }, [isLoaded, isAuthenticated, user, router]);
 
     const fetchMyProducts = async () => {
-        if (!username) return;
+        if (!userId) return;
         try {
             setLoading(true);
             const response = await fetch(`${API_URL}/api/v1/products/me`, {
-                headers: { 'X-User-Name': username }
+                headers: { 'X-User-Id': userId }
             });
             if (response.ok) setProducts(await response.json());
         } catch {
@@ -55,8 +55,8 @@ export default function JastiperDashboard() {
     };
 
     useEffect(() => {
-        if (username) fetchMyProducts();
-    }, [username]);
+        if (userId) fetchMyProducts();
+    }, [userId]);
 
     const executeDelete = async () => {
         const id = modal.targetId;
@@ -65,7 +65,7 @@ export default function JastiperDashboard() {
         try {
             const response = await fetch(`${API_URL}/api/v1/products/${id}`, {
                 method: 'DELETE',
-                headers: { 'X-User-Name': username }
+                headers: { 'X-User-Id': userId }
             });
 
             if (response.ok) {
