@@ -3,10 +3,13 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from '../jastiper.module.css';
 import { useAuth } from '@/hooks/useAuth';
+import { useModal } from '@/hooks/useModal';
+import Modal from '@/components/Modal';
 
 function ManageProductForm() {
     const router = useRouter();
     const { isLoaded, isAuthenticated, user } = useAuth();
+    const { modal, openModal, closeModal } = useModal();
     
     const searchParams = useSearchParams();
     const productId = searchParams.get('id');
@@ -24,13 +27,6 @@ function ManageProductForm() {
     });
     
     const [fetching, setFetching] = useState<boolean>(false);
-    
-    const [modal, setModal] = useState({
-        isOpen: false,
-        title: '',
-        message: '',
-        redirectPath: ''
-    });
 
     useEffect(() => {
         if (isLoaded) {
@@ -59,18 +55,18 @@ function ManageProductForm() {
                             arrivalDate: data.arrivalDate || ''
                         });
                     } else {
-                        setModal({
-                            isOpen: true,
+                        openModal({
                             title: "Gagal Memuat",
                             message: "Gagal mengambil detail produk. Produk mungkin telah dihapus.",
+                            type: 'info',
                             redirectPath: '/jastiper/products'
                         });
                     }
                 } catch (error) {
-                    setModal({
-                        isOpen: true,
+                    openModal({
                         title: "Koneksi Bermasalah",
                         message: "Tidak dapat terhubung ke server.",
+                        type: 'info',
                         redirectPath: '/jastiper/products'
                     });
                 } finally {
@@ -88,7 +84,7 @@ function ManageProductForm() {
 
     const handleCloseModal = () => {
         const path = modal.redirectPath;
-        setModal({ ...modal, isOpen: false });
+        closeModal();
         if (path) {
             router.push(path);
         }
@@ -111,31 +107,29 @@ function ManageProductForm() {
                 throw new Error("ID pengguna tidak ditemukan di dalam sesi");
             }
         } catch (error) {
-            setModal({
-                isOpen: true,
+            openModal({
                 title: "Sesi Tidak Valid",
                 message: "Data sesi Anda rusak atau ID tidak ditemukan. Silakan login kembali.",
+                type: 'info',
                 redirectPath: '/login'
             });
             return;
         }
 
         if (parseInt(formData.stock) < 0) {
-            setModal({
-                isOpen: true,
+            openModal({
                 title: "Validasi Gagal",
                 message: "Stok minimal bernilai 0",
-                redirectPath: ''
+                type: 'info'
             });
             return;
         }
         
         if (parseFloat(formData.price) < 0) {
-            setModal({
-                isOpen: true,
+            openModal({
                 title: "Validasi Gagal",
                 message: "Harga tidak boleh negatif",
-                redirectPath: ''
+                type: 'info'
             });
             return;
         }
@@ -160,27 +154,25 @@ function ManageProductForm() {
             });
 
             if (response.ok) {
-                setModal({
-                    isOpen: true,
+                openModal({
                     title: "Berhasil!",
                     message: isEditMode ? "Produk berhasil diperbarui!" : "Produk berhasil ditambahkan ke katalog!",
+                    type: 'info',
                     redirectPath: '/jastiper/products'
                 });
             } else {
                 const errorText = await response.text();
-                setModal({
-                    isOpen: true,
+                openModal({
                     title: "Gagal Menyimpan",
                     message: `Gagal menyimpan data: ${errorText}`,
-                    redirectPath: ''
+                    type: 'info'
                 });
             }
         } catch (error) {
-            setModal({
-                isOpen: true,
+            openModal({
                 title: "Kesalahan Sistem",
                 message: "Terjadi kesalahan koneksi sistem saat menyimpan data.",
-                redirectPath: ''
+                type: 'info'
             });
         }
     };
@@ -198,24 +190,13 @@ function ManageProductForm() {
 
     return (
         <div className={styles.pageContainer}>
-            {modal.isOpen && (
-                <div className={styles.modalBackdrop}>
-                    <div className={styles.modalCard}>
-                        <h2 className={styles.modalTitle}>{modal.title}</h2>
-                        <p className={styles.modalMessage} style={{ textAlign: 'center', marginBottom: '24px' }}>
-                            {modal.message}
-                        </p>
-                        <div style={{ display: 'flex', justifyContent: 'center' }}>
-                            <button 
-                                className={styles.primaryBtn}
-                                onClick={handleCloseModal}
-                            >
-                                Mengerti
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <Modal 
+                isOpen={modal.isOpen} 
+                title={modal.title} 
+                message={modal.message} 
+                type={modal.type || 'info'} 
+                onClose={handleCloseModal} 
+            />
 
             <div className={styles.banner}></div>
             <div className={styles.card}>
