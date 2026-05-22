@@ -138,50 +138,65 @@ export default function ManageUsersPage() {
             ) : filteredUsers.length === 0 ? (
                 <p style={{ textAlign: 'center', marginTop: '40px', color: '#666' }}>Tidak ada pengguna ditemukan.</p>
             ) : (
-                <div style={{ overflowX: 'auto', marginTop: '20px' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead>
-                        <tr style={{ backgroundColor: '#f4f4f4', borderBottom: '2px solid #ddd' }}>
-                            <th style={{ padding: '12px' }}>Nama Lengkap</th>
-                            <th style={{ padding: '12px' }}>Email</th>
-                            <th style={{ padding: '12px' }}>Role</th>
-                            <th style={{ padding: '12px' }}>Status KYC</th>
-                            <th style={{ padding: '12px' }}>Status Akun</th>
-                            <th style={{ padding: '12px' }}>Aksi</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {filteredUsers.map((user) => (
-                            <tr key={user.id} style={{ borderBottom: '1px solid #ddd' }}>
-                                <td style={{ padding: '12px' }}>{user.fullName}</td>
-                                <td style={{ padding: '12px' }}>{user.email}</td>
-                                <td style={{ padding: '12px', fontWeight: 'bold' }}>{user.role}</td>
-                                <td style={{ padding: '12px' }}>{user.kycStatus}</td>
-                                <td style={{ padding: '12px', color: user.banned ? 'red' : 'green' }}>
-                                    {user.banned ? 'Banned' : 'Aktif'}
-                                </td>
-                                <td style={{ padding: '12px' }}>
-                                    {!user.banned && (
-                                        <button
-                                            onClick={() => handleBanUser(user.email)}
-                                            style={{ backgroundColor: 'red', color: 'white', padding: '6px 12px', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '8px' }}
-                                        >
-                                            Ban
-                                        </button>
-                                    )}
-                                    {user.role === 'JASTIPER' && (
-                                        <button
-                                            onClick={() => handleDemoteUser(user.email)}
-                                            style={{ backgroundColor: 'orange', color: 'white', padding: '6px 12px', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                                        >
-                                            Demote
-                                        </button>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
+                <div className={styles.listContainer}>
+                    {filteredUsers.map((user) => (
+                        <div key={user.id} className={styles.listItem}>
+
+                            <div className={styles.itemLeft}>
+                                <img
+                                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.fullName || user.email}&backgroundColor=8F39DF`}
+                                    alt={`Foto profil ${user.fullName}`}
+                                    className={styles.profileImage}
+                                />
+
+                                <div className={styles.infoStack}>
+                    <span className={styles.name}>
+                        {user.fullName}
+                    </span>
+
+                                    <span className={styles.email}>
+                        {user.email}
+                    </span>
+
+                                    <span className={styles.nik}>
+                        {user.role} • {user.kycStatus}
+                    </span>
+                                </div>
+                            </div>
+
+                            <div className={styles.itemCenter}>
+                <span
+                    style={{
+                        color: user.banned ? '#dc2626' : '#16a34a',
+                        fontWeight: 'bold'
+                    }}
+                >
+                    {user.banned ? 'BANNED' : 'ACTIVE'}
+                </span>
+                            </div>
+
+                            <div className={styles.itemRight}>
+                                {!user.banned && (
+                                    <button
+                                        className={styles.rejectBtn}
+                                        onClick={() => handleBanUser(user.email)}
+                                    >
+                                        Ban
+                                    </button>
+                                )}
+
+                                {user.role === 'JASTIPER' && (
+                                    <button
+                                        className={styles.acceptBtn}
+                                        onClick={() => handleDemoteUser(user.email)}
+                                    >
+                                        Demote
+                                    </button>
+                                )}
+                            </div>
+
+                        </div>
+                    ))}
                 </div>
             )}
         </>
