@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from '../../products/titipers.module.css';
 
@@ -10,7 +10,7 @@ interface Product {
     ownerUsername: string; jastiperId: string;
 }
 
-export default function CheckoutPage() {
+function CheckoutContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const productId = searchParams.get('productId');
@@ -147,5 +147,17 @@ export default function CheckoutPage() {
                 </div>
             )}
         </div>
+    );
+}
+
+export default function CheckoutPage() {
+    return (
+        <Suspense fallback={
+            <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <p>Memuat halaman checkout...</p>
+            </div>
+        }>
+            <CheckoutContent />
+        </Suspense>
     );
 }
