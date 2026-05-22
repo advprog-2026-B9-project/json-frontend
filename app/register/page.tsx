@@ -35,7 +35,7 @@ export default function RegisterCard() {
 
         try {
             const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-            const response = await fetch(`${API_URL}/auth/register`, {
+            const response = await fetch(`${API_URL}/api/v1/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ fullName, email, password }),
