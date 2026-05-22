@@ -64,10 +64,14 @@ function CheckoutContent() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    productId: product.id, titiperId, quantity,
+                    productId: product.id,
+                    titiperId: titiperId,
+                    quantity: quantity,
                     totalPrice: product.price * quantity,
                     shippingAddress: shippingAddress.trim(),
                     productName: product.name,
+                    jastiperId: product.jastiperId, // <-- Tambahkan ini
+                    jastiperUsername: product.ownerUsername // <-- Tambahkan ini
                 })
             });
             if (response.ok) {
