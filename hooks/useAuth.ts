@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 interface UserData {
+    id: string;
     username: string;
     [key: string]: any;
 }
@@ -25,6 +26,7 @@ export function useAuth() {
         user, 
         isLoaded, 
         isAuthenticated: !!user,
-        username: user?.username || ''
+        username: user?.username || '',
+        userId: user?.id || ''
     };
 }
