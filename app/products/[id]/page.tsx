@@ -11,7 +11,7 @@ interface Product {
     stock: number;
     originCountry: string;
     arrivalDate: string;
-    ownerUsername: string;
+    ownerId: string;
     averageRating: number;
     totalReviews: number;
 }
@@ -24,7 +24,7 @@ export default function ProductDetailPage() {
 
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    const [loggedInUsername, setLoggedInUsername] = useState<string>('');
+    const [loggedInUserId, setLoggedInUserId] = useState<string>('');
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '', redirectPath: '' });
 
     useEffect(() => {
@@ -32,8 +32,9 @@ export default function ProductDetailPage() {
         if (storedUser) {
             try {
                 const userData = JSON.parse(storedUser);
-                if (userData && userData.username) {
-                    setLoggedInUsername(userData.username);
+                const activeUserId = userData?.id || userData?.userId || '';
+                if (activeUserId) {
+                    setLoggedInUserId(activeUserId);
                 }
             } catch (error) {
                 console.error(error);
@@ -74,7 +75,7 @@ export default function ProductDetailPage() {
     }, [id, API_URL]);
 
     const handleCheckout = () => {
-        if (!loggedInUsername) {
+        if (!loggedInUserId) {
             setModal({
                 isOpen: true,
                 title: "Akses Ditolak",
@@ -105,7 +106,7 @@ export default function ProductDetailPage() {
 
     if (!product && !modal.isOpen) return null;
 
-    const isOwner = product ? loggedInUsername === product.ownerUsername : false;
+    const isOwner = product ? loggedInUserId === product.ownerId : false;
 
     return (
         <div className={styles.pageContainer}>
@@ -137,8 +138,8 @@ export default function ProductDetailPage() {
                         
                         <div className={styles.specBox}>
                             <div className={styles.metaItem}>
-                                Jastiper
-                                <strong>@{product.ownerUsername}</strong>
+                                Jastiper ID
+                                <strong>{product.ownerId}</strong>
                             </div>
                             <div className={styles.metaItem}>
                                 Rating

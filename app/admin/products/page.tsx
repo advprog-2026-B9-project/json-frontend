@@ -17,7 +17,7 @@ interface ProductDetailResponse {
     stock: number;
     originCountry: string;
     arrivalDate: string;
-    jastiperUsername: string;
+    jastiperId: string;
 }
 
 export default function ManageProductsPage() {
@@ -29,7 +29,7 @@ export default function ManageProductsPage() {
     const [loading, setLoading] = useState<boolean>(true);
 
     const [searchName, setSearchName] = useState('');
-    const [searchJastiper, setSearchJastiper] = useState('');
+    const [searchJastiperId, setSearchJastiperId] = useState('');
     
     const { currentData, currentPage, totalPages, next, prev, goTo } = usePagination(products, 6);
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
@@ -44,12 +44,12 @@ export default function ManageProductsPage() {
         }
     }, [isLoaded, isAuthenticated, user, router]);
 
-    const fetchAllProducts = async (nameQuery = '', jastiperQuery = '') => {
+    const fetchAllProducts = async (nameQuery = '', jastiperIdQuery = '') => {
         try {
             setLoading(true);
             const queryParams = new URLSearchParams();
             if (nameQuery) queryParams.append('name', nameQuery);
-            if (jastiperQuery) queryParams.append('jastiper', jastiperQuery);
+            if (jastiperIdQuery) queryParams.append('jastiperId', jastiperIdQuery);
 
             const url = `${API_URL}/api/v1/products${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
             const response = await fetch(url);
@@ -73,7 +73,7 @@ export default function ManageProductsPage() {
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         goTo(1); 
-        fetchAllProducts(searchName, searchJastiper);
+        fetchAllProducts(searchName, searchJastiperId);
     };
 
     const executeDelete = async () => {
@@ -87,7 +87,7 @@ export default function ManageProductsPage() {
 
             if (response.ok) {
                 openModal({ title: "Berhasil", message: "Produk berhasil diturunkan (Take Down) dari sistem.", type: 'info' });
-                fetchAllProducts(searchName, searchJastiper); 
+                fetchAllProducts(searchName, searchJastiperId); 
                 
                 if (currentData.length === 1 && currentPage > 1) goTo(currentPage - 1);
             } else {
@@ -125,13 +125,13 @@ export default function ManageProductsPage() {
                     />
                 </div>
                 <div className={styles.inputGroup}>
-                    <label className={styles.label}>Username Jastiper</label>
+                    <label className={styles.label}>ID Jastiper</label>
                     <input 
                         type="text" 
                         className={styles.inputField}
-                        placeholder="Cari jastiper spesifik..."
-                        value={searchJastiper}
-                        onChange={(e) => setSearchJastiper(e.target.value)}
+                        placeholder="Masukkan UUID Jastiper..."
+                        value={searchJastiperId}
+                        onChange={(e) => setSearchJastiperId(e.target.value)}
                     />
                 </div>
                 <button type="submit" className={sharedStyles.primaryBtn} style={{ height: '42px', padding: '0 32px' }}>
@@ -163,7 +163,7 @@ export default function ManageProductsPage() {
                                         {product.description}
                                     </span>
                                     <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-primary)', marginTop: '4px' }}>
-                                        Jastiper: @{product.jastiperUsername}
+                                        Jastiper ID: {product.jastiperId}
                                     </span>
                                 </div>
                                 
