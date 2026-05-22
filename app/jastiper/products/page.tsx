@@ -39,14 +39,23 @@ export default function JastiperDashboard() {
         }
     }, [isLoaded, isAuthenticated, user, router]);
 
+    const getActiveUserId = () => {
+        return userId || (user as any)?.id || (user as any)?.userId || '';
+    };
+
     const fetchMyProducts = async () => {
-        if (!userId) return;
+        const activeUserId = getActiveUserId();
+        
+        if (!activeUserId) return; 
+
         try {
             setLoading(true);
             const response = await fetch(`${API_URL}/api/v1/products/me`, {
-                headers: { 'X-User-Id': userId }
+                headers: { 'X-User-Id': String(activeUserId) } 
             });
-            if (response.ok) setProducts(await response.json());
+            if (response.ok) {
+                setProducts(await response.json());
+            }
         } catch {
             openModal({ title: "Error", message: "Koneksi ke server bermasalah.", type: 'info' });
         } finally {
@@ -55,26 +64,32 @@ export default function JastiperDashboard() {
     };
 
     useEffect(() => {
-        if (userId) fetchMyProducts();
-    }, [userId]);
+        if (isLoaded && isAuthenticated) {
+            fetchMyProducts();
+        }
+    }, [isLoaded, isAuthenticated, userId, user]);
 
     const executeDelete = async () => {
         const id = modal.targetId;
         closeModal();
 
+        const activeUserId = getActiveUserId();
+
         try {
             const response = await fetch(`${API_URL}/api/v1/products/${id}`, {
                 method: 'DELETE',
-                headers: { 'X-User-Id': userId }
+                headers: { 'X-User-Id': String(activeUserId) }
             });
 
             if (response.ok) {
                 openModal({ title: "Berhasil", message: "Produk dihapus.", type: 'info' });
                 fetchMyProducts();
                 if (currentData.length === 1 && currentPage > 1) goTo(currentPage - 1);
+            } else {
+                openModal({ title: "Gagal", message: "Gagal menghapus produk. Status: " + response.status, type: 'info' });
             }
         } catch {
-            openModal({ title: "Error", message: "Gagal menghapus produk.", type: 'info' });
+            openModal({ title: "Error", message: "Koneksi gagal saat menghapus produk.", type: 'info' });
         }
     };
 

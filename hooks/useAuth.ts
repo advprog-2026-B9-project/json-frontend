@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 
 interface UserData {
-    id: string;
     username: string;
     [key: string]: any;
 }

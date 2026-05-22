@@ -13,7 +13,7 @@ interface ProductDetailResponse {
     arrivalDate: string;
     averageRating: number;
     totalReviews: number;
-    jastiperUsername: string;
+    jastiperId: string;
     jastiperFullName: string;
 }
 
@@ -25,19 +25,19 @@ export default function ProductSearchPage() {
     const [loading, setLoading] = useState<boolean>(true);
     
     const [searchName, setSearchName] = useState('');
-    const [searchJastiper, setSearchJastiper] = useState('');
+    const [searchJastiperId, setSearchJastiperId] = useState('');
 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 8; 
 
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
 
-    const fetchProducts = async (nameQuery = '', jastiperQuery = '') => {
+    const fetchProducts = async (nameQuery = '', jastiperIdQuery = '') => {
         try {
             setLoading(true);
             const queryParams = new URLSearchParams();
             if (nameQuery) queryParams.append('name', nameQuery);
-            if (jastiperQuery) queryParams.append('jastiper', jastiperQuery);
+            if (jastiperIdQuery) queryParams.append('jastiperId', jastiperIdQuery); 
 
             const url = `${API_URL}/api/v1/products${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
             const response = await fetch(url);
@@ -70,7 +70,7 @@ export default function ProductSearchPage() {
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         setCurrentPage(1);
-        fetchProducts(searchName, searchJastiper);
+        fetchProducts(searchName, searchJastiperId);
     };
 
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -88,7 +88,6 @@ export default function ProductSearchPage() {
 
     return (
         <div className={styles.pageContainer}>
-            {/* Modal Handler */}
             {modal.isOpen && (
                 <div className={styles.modalBackdrop}>
                     <div className={styles.modalCard}>
@@ -121,13 +120,13 @@ export default function ProductSearchPage() {
                     />
                 </div>
                 <div className={styles.inputGroup}>
-                    <label className={styles.label}>Username Jastiper</label>
+                    <label className={styles.label}>ID Jastiper</label>
                     <input 
                         type="text" 
                         className={styles.inputField} 
-                        placeholder="Cari jastiper spesifik..."
-                        value={searchJastiper}
-                        onChange={(e) => setSearchJastiper(e.target.value)}
+                        placeholder="Masukkan UUID Jastiper..."
+                        value={searchJastiperId}
+                        onChange={(e) => setSearchJastiperId(e.target.value)}
                     />
                 </div>
                 <button type="submit" className={styles.searchBtn}>
@@ -173,7 +172,7 @@ export default function ProductSearchPage() {
                                         </div>
                                         <div className={styles.cardFooter}>
                                             <span className={styles.jastiperName}>
-                                                Oleh: {product.jastiperUsername}
+                                                Oleh: {product.jastiperFullName}
                                             </span>
                                             <span className={styles.rating}>
                                                 ★ {product.averageRating > 0 ? product.averageRating.toFixed(1) : 'New'}
@@ -184,7 +183,6 @@ export default function ProductSearchPage() {
                             ))}
                         </div>
 
-                        {/* Kontrol Navigasi Paging */}
                         {totalPages > 1 && (
                             <div className={styles.paginationContainer}>
                                 <button 

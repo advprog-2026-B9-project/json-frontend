@@ -67,7 +67,6 @@ function ManageProductForm() {
                         });
                     }
                 } catch (error) {
-                    console.error(error);
                     setModal({
                         isOpen: true,
                         title: "Koneksi Bermasalah",
@@ -99,28 +98,23 @@ function ManageProductForm() {
         e.preventDefault();
 
         const storedUser = localStorage.getItem('user');
-        if (!storedUser) {
-            setModal({
-                isOpen: true,
-                title: "Sesi Berakhir",
-                message: "Sesi Anda telah habis. Silakan login kembali.",
-                redirectPath: '/login'
-            });
-            return;
-        }
-
         let activeUserId = '';
+
         try {
+            if (!storedUser) throw new Error("Tidak ada data user");
+            
             const userData = JSON.parse(storedUser);
-            activeUserId = userData?.userId;
+            
+            activeUserId = userData?.id || userData?.userId; 
+
             if (!activeUserId) {
-                throw new Error("Username tidak ditemukan");
+                throw new Error("ID pengguna tidak ditemukan di dalam sesi");
             }
         } catch (error) {
             setModal({
                 isOpen: true,
                 title: "Sesi Tidak Valid",
-                message: "Data sesi Anda rusak. Silakan login kembali.",
+                message: "Data sesi Anda rusak atau ID tidak ditemukan. Silakan login kembali.",
                 redirectPath: '/login'
             });
             return;
@@ -149,8 +143,7 @@ function ManageProductForm() {
         const payload = {
             ...formData,
             price: parseFloat(formData.price),
-            stock: parseInt(formData.stock),
-            ownerUsername: activeUserId
+            stock: parseInt(formData.stock)
         };
 
         const url = isEditMode ? `${API_URL}/api/v1/products/${productId}` : `${API_URL}/api/v1/products`;
@@ -161,7 +154,7 @@ function ManageProductForm() {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-User-Id': activeUserId
+                    'X-User-Id': String(activeUserId)
                 },
                 body: JSON.stringify(payload)
             });
@@ -183,7 +176,6 @@ function ManageProductForm() {
                 });
             }
         } catch (error) {
-            console.error(error);
             setModal({
                 isOpen: true,
                 title: "Kesalahan Sistem",
@@ -206,7 +198,6 @@ function ManageProductForm() {
 
     return (
         <div className={styles.pageContainer}>
-            {/* Modal Handler */}
             {modal.isOpen && (
                 <div className={styles.modalBackdrop}>
                     <div className={styles.modalCard}>
