@@ -25,7 +25,7 @@ function AdminEditProductForm() {
         stock: '',
         originCountry: '',
         arrivalDate: '',
-        ownerId: ''
+        ownerUsername: ''
     });
     const [fetching, setFetching] = useState<boolean>(true);
 
@@ -58,7 +58,7 @@ function AdminEditProductForm() {
                         stock: data.stock.toString(),
                         originCountry: data.originCountry || '',
                         arrivalDate: data.arrivalDate || '',
-                        ownerId: data.ownerId || ''
+                        ownerUsername: data.ownerUsername || ''
                     });
                 } else {
                     openModal({
@@ -164,7 +164,7 @@ function AdminEditProductForm() {
             <div className={styles.card} style={{ margin: '0 auto', maxWidth: '900px' }}>
                 <h1 className={styles.headerTitle} style={{ marginBottom: '10px' }}>Edit Produk</h1>
                 <p style={{ color: '#6B7280', marginBottom: '30px', fontSize: '14px' }}>
-                    Anda sedang mengubah paksa properti produk milik jastiper ID: <b>{formData.ownerId}</b>.
+                    Anda sedang mengubah paksa properti produk milik jastiper <b>@{formData.ownerUsername}</b>.
                 </p>
 
                 <form onSubmit={handleSubmit} className={styles.formGrid}>
