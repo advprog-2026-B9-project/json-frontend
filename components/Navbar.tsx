@@ -10,6 +10,7 @@ type UserSession = {
   username?: string;
   fullName?: string;
   role?: string;
+  photoUrl?: string;
 };
 
 const Navbar = () => {
@@ -142,7 +143,11 @@ const Navbar = () => {
                   </div>
                   <div className={styles.avatarCircle}>
                     <img
-                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.fullName || 'User'}&backgroundColor=000000`}
+                      src={
+                        user.photoUrl
+                          ? user.photoUrl
+                            : `https://api.dicebear.com/7.x/initials/svg?seed=${user.fullName || 'User'}&backgroundColor=000000`
+                      }
                       alt="Avatar"
                       className={styles.avatarImg}
                     />

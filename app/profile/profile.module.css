@@ -90,6 +90,28 @@
     opacity: 0.9;
 }
 
+.photoInputWrapper {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 8px;
+    white-space: nowrap;
+}
+
+.photoInput {
+    width: 240px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+}
+
 /* Header */
 .topHeader {
     display: flex;

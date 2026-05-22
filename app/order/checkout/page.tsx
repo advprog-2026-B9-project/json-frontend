@@ -68,6 +68,8 @@ function CheckoutContent() {
                     totalPrice: product.price * quantity,
                     shippingAddress: shippingAddress.trim(),
                     productName: product.name,
+                    jastiperId: product.jastiperId,
+                    jastiperUsername: product.ownerUsername
                 })
             });
             if (response.ok) {
