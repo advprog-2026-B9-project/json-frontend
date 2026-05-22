@@ -1,7 +1,7 @@
 'use client';
 
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import styles from './Navbar.module.css';
 
@@ -16,19 +16,13 @@ type UserSession = {
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<UserSession | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  
+
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    setIsOpen(false);
     const storedUser = localStorage.getItem('user');
+
     if (storedUser) {
       try {
         setUser(JSON.parse(storedUser));
@@ -41,16 +35,11 @@ const Navbar = () => {
   }, [pathname]);
 
   const handleLogout = () => {
-    setIsLoggingOut(true);
     localStorage.removeItem('user');
     setUser(null);
     setIsOpen(false);
     router.push('/login');
   };
-
-  if (!isMounted || isLoggingOut) {
-    return null;
-  }
 
   const userRole = user?.role?.toUpperCase();
   const isAdmin = userRole === 'ADMIN';
@@ -151,7 +140,7 @@ const Navbar = () => {
                         user.photoUrl
                           ? user.photoUrl
                             : `https://api.dicebear.com/7.x/initials/svg?seed=${
-                              user.fullName || user.username || user.role || 'User'}  
+                              user.fullName || user.username || user.role || 'User'  
                             }&backgroundColor=8F39DF`
                       }
                       alt="Avatar"
