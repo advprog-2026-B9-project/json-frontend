@@ -102,7 +102,6 @@ export default function ProfilePage() {
                 if (response.ok) {
                     const latestData = await response.json();
 
-                    // Amankan id, userId, dan token bawaan agar tidak tertimpa data kosong
                     const mergedData = {
                         ...parsedUser,
                         ...latestData,
