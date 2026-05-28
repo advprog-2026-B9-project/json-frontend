@@ -66,7 +66,7 @@ function ProfileContent() {
         if (!emailParam) return;
         try {
             setSubmittingRating(true);
-            const response = await fetch(`${API_URL}/auth/rating?jastiperEmail=${encodeURIComponent(emailParam)}&ratingScore=${selectedRating}`, {
+            const response = await fetch(`${API_URL}/api/v1/auth/rating?jastiperEmail=${encodeURIComponent(emailParam)}&ratingScore=${selectedRating}`, {
                 method: 'POST'
             });
 
