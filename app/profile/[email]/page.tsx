@@ -33,7 +33,7 @@ export default function PublicProfilePage() {
         const fetchPublicProfile = async () => {
             try {
                 setLoading(true);
-                const response = await fetch(`${API_URL}/auth/user?email=${encodeURIComponent(email)}`);
+                const response = await fetch(`${API_URL}/api/v1/auth/user?email=${encodeURIComponent(email)}`);
                 if (response.ok) {
                     const data = await response.json();
                     setProfile(data);
