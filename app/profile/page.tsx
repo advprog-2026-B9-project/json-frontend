@@ -97,7 +97,7 @@ export default function ProfilePage() {
 
             try {
                 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-                const response = await fetch(`${API_URL}/api/v1/auth/user?email=${encodeURIComponent(parsedUser.email)}`);
+                const response = await fetch(`${API_URL}/api/v1/auth/user?email=${encodeURIComponent(parsedUser.email)}`); // url nyangkut
 
                 if (response.ok) {
                     const latestData = await response.json();
