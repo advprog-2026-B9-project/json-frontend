@@ -59,14 +59,14 @@ const Navbar = () => {
       { href: '/', label: 'Home' },
       { href: '/jastiper/products', label: 'Dashboard Jastiper' },
       { href: '/wallet', label: 'Wallet' },
-      { href: '/profile', label: 'Profile' },
+      { href: '/profiles', label: 'Profiles' },
     ];
   } else if (userRole === 'TITIPERS') {
     navLinks = [
       { href: '/', label: 'Home' },
       { href: '/products', label: 'Products' },
       { href: '/wallet', label: 'Wallet' },
-      { href: '/profile', label: 'Profile' },
+      { href: '/profiles', label: 'Profiles' },
     ];
   }
 
