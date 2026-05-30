@@ -395,10 +395,12 @@ export default function WalletPage() {
                                 <TopUpIcon />
                                 Top Up
                             </button>
-                            <button type="button" className={styles.withdrawButton} onClick={() => { setInputAmount(""); setActiveAction("withdraw"); }} disabled={isSubmitting || !walletId}>
-                                <WithdrawIcon />
-                                Withdraw
-                            </button>
+                            {userRole === 'JASTIPER' && (
+                                <button type="button" className={styles.withdrawButton} onClick={() => { setInputAmount(""); setActiveAction("withdraw"); }} disabled={isSubmitting || !walletId}>
+                                    <WithdrawIcon />
+                                    Withdraw
+                                </button>
+                            )}
                         </div>
                     </section>
 
